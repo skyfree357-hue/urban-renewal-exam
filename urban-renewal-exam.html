@@ -17,6 +17,7 @@
     .choice:hover { border-color: #14b8a6; }
     .correct { background:#dcfce7!important; border-color:#22c55e!important; }
     .wrong { background:#fee2e2!important; border-color:#ef4444!important; }
+    #floatingSubmit { padding-bottom: max(0.75rem, env(safe-area-inset-bottom)); }
   </style>
 </head>
 <body class="min-h-screen text-slate-800">
@@ -56,6 +57,7 @@
       </form>
     </section>
   </main>
+  <button id="floatingSubmit" class="fixed bottom-0 left-0 right-0 z-30 hidden w-full bg-teal-800 px-5 py-3 text-center font-black text-white shadow-[0_-4px_18px_rgba(15,118,110,.28)] sm:hidden">提交考卷</button>
 
   <div id="adminPasswordModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 p-4" role="dialog" aria-modal="true" aria-labelledby="adminPasswordTitle">
     <form id="adminPasswordForm" class="w-full max-w-sm rounded-3xl bg-white p-6 shadow-2xl">
@@ -124,7 +126,7 @@ async function init() { const saved=localStorage.getItem(STORAGE_KEY), verified=
 function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(bank)); }
 function refreshInfo() { $('bankInfo').textContent=`目前題庫：單選 ${bank.single_choice.length} 題／複選 ${bank.multiple_choice.length} 題`; }
 function shuffle(a) { return [...a].sort(()=>Math.random()-.5); }
-function startExam() { if(bank.single_choice.length<25 || bank.multiple_choice.length<25) return alert('題庫不足：單選與複選各至少需要 25 題。請先於後台匯入完整題庫。'); exam=[...shuffle(bank.single_choice).slice(0,25).map(q=>({...q,type:'single_choice'})),...shuffle(bank.multiple_choice).slice(0,25).map(q=>({...q,type:'multiple_choice'}))]; submitted=false; $('welcome').classList.add('hidden');$('examArea').classList.remove('hidden');$('result').classList.add('hidden');renderExam();window.scrollTo({top:0,behavior:'smooth'}); }
+function startExam() { if(bank.single_choice.length<25 || bank.multiple_choice.length<25) return alert('題庫不足：單選與複選各至少需要 25 題。請先於後台匯入完整題庫。'); exam=[...shuffle(bank.single_choice).slice(0,25).map(q=>({...q,type:'single_choice'})),...shuffle(bank.multiple_choice).slice(0,25).map(q=>({...q,type:'multiple_choice'}))]; submitted=false; $('welcome').classList.add('hidden');$('examArea').classList.remove('hidden');$('result').classList.add('hidden');$('floatingSubmit').classList.remove('hidden');$('floatingSubmit').disabled=false;renderExam();window.scrollTo({top:0,behavior:'smooth'}); }
 function renderExam() { $('progress').textContent=`本次共 ${exam.length} 題（每題 2 分）`; $('questions').innerHTML=exam.map((q,qi)=>`<article class="rounded-2xl border bg-white p-5 shadow-sm"><h3 class="font-black leading-6">【${q.type==='single_choice'?'單選題':'複選題'}】原始題號：${esc(q.id)}</h3><p class="mt-3 whitespace-pre-wrap leading-7">${esc(q.question)}</p><div class="mt-4 space-y-2">${q.options.map((o,oi)=>`<label id="choice-${qi}-${oi}" class="choice flex cursor-pointer gap-3 rounded-xl border p-3"><input class="mt-1" type="${q.type==='single_choice'?'radio':'checkbox'}" name="q-${qi}" value="${oi}"><span><b>${'ABCD'[oi]}.</b> ${esc(o)}</span></label>`).join('')}</div><div id="feedback-${qi}" class="hidden mt-4 rounded-xl bg-slate-50 p-3 text-sm"></div></article>`).join(''); }
 function submitExam() { if(submitted)return; submitted=true; let correct=0; exam.forEach((q,qi)=>{ const selected=[...document.querySelectorAll(`input[name="q-${qi}"]:checked`)].map(x=>+x.value).sort(); const right=[...q.answer].sort(); const ok=selected.length===right.length&&selected.every((v,i)=>v===right[i]); if(ok)correct++; q.options.forEach((_,oi)=>{const el=$(`choice-${qi}-${oi}`);if(right.includes(oi))el.classList.add('correct'); if(selected.includes(oi)&&!right.includes(oi))el.classList.add('wrong');}); const fb=$(`feedback-${qi}`);fb.classList.remove('hidden');fb.innerHTML=`<b class="${ok?'text-green-700':'text-red-700'}">${ok?'答對！':'答錯。'}</b> 正確答案：${right.map(i=>'ABCD'[i]).join('、')}`; }); const points=correct*2;$('score').textContent=`${points} 分`;$('scoreText').textContent=`答對 ${correct} / 50 題`;$('result').classList.remove('hidden');$('submitBtn').disabled=true;$('submitBtn').classList.add('opacity-50'); }
 function submitExam() { if(submitted)return; submitted=true; let correct=0; const correctItems=[],wrongItems=[]; exam.forEach((q,qi)=>{ const selected=[...document.querySelectorAll(`input[name="q-${qi}"]:checked`)].map(x=>+x.value).sort(); const right=[...q.answer].sort(); const ok=selected.length===right.length&&selected.every((v,i)=>v===right[i]); if(ok)correct++; (ok?correctItems:wrongItems).push({q,qi,selected,right}); q.options.forEach((_,oi)=>{const el=$(`choice-${qi}-${oi}`);if(right.includes(oi))el.classList.add('correct'); if(selected.includes(oi)&&!right.includes(oi))el.classList.add('wrong');}); const fb=$(`feedback-${qi}`);fb.classList.remove('hidden');fb.innerHTML=`<b class="${ok?'text-green-700':'text-red-700'}">${ok?'答對！':'答錯。'}</b> 正確答案：${right.map(i=>'ABCD'[i]).join('、')}`; }); const renderSummary=(items,kind)=>items.length?items.map(({q,qi,selected,right})=>{const type=q.type==='single_choice'?'單選題':'複選題',your=selected.length?selected.map(i=>'ABCD'[i]).join('、'):'未作答',answer=right.map(i=>'ABCD'[i]).join('、');return `<article class="rounded-xl border p-3 text-sm ${kind==='correct'?'border-green-200 bg-green-50':'border-red-200 bg-red-50'}"><p class="font-black">【${type}】原始題號：${esc(q.id)}</p><p class="mt-1 leading-6">${esc(q.question)}</p><p class="mt-2 ${kind==='correct'?'text-green-800':'text-red-700'}">你的答案：${your}</p>${kind==='wrong'?`<p class="mt-1 font-bold text-green-800">正確答案：${answer}</p>`:''}<a href="#choice-${qi}-0" class="mt-2 inline-block font-bold text-teal-700 underline">查看原題</a></article>`;}).join(''):'<p class="rounded-xl bg-slate-50 p-3 text-sm text-slate-500">沒有題目。</p>'; const points=correct*2;$('score').textContent=`${points} 分`;$('scoreText').textContent=`答對 ${correct} / 50 題`;$('correctSummaryCount').textContent=`共 ${correctItems.length} 題`;$('wrongSummaryCount').textContent=`共 ${wrongItems.length} 題`;$('correctSummary').innerHTML=renderSummary(correctItems,'correct');$('wrongSummary').innerHTML=renderSummary(wrongItems,'wrong');$('result').classList.remove('hidden');$('submitBtn').disabled=true;$('submitBtn').classList.add('opacity-50'); }
@@ -137,8 +139,40 @@ function renderList(){const type=$('filterType').value,no=$('filterNo').value.tr
 function nextQuestionId(type){return bank[type].reduce((max,q)=>Math.max(max,Number(q.id)||0),0)+1;}
 function openEditor(type,index=null){const isNew=index===null;const q=isNew?{id:nextQuestionId(type),question:'',options:['','','',''],answer:[]}:bank[type][index];$('editor').classList.remove('hidden');$('editType').value=type;$('editIndex').value=isNew?'new':String(index);$('deleteBtn').classList.toggle('hidden',isNew);$('editTitle').textContent=`${isNew?'新增':'編輯'}${type==='single_choice'?'單選':'複選'}題｜原始題號：${q.id}`;$('editQuestion').value=q.question;$('optionEditors').innerHTML=[0,1,2,3].map(i=>`<label class="text-sm font-bold">選項 ${'ABCD'[i]}<input class="option-input mt-1 w-full rounded-xl border p-3" required value="${attr(q.options[i]||'')}"></label>`).join('');$('answerEditors').innerHTML=[0,1,2,3].map(i=>`<label class="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2"><input type="${type==='single_choice'?'radio':'checkbox'}" name="correct-answer" value="${i}" ${q.answer.includes(i)?'checked':''}> ${'ABCD'[i]}</label>`).join('');$('editor').scrollIntoView({behavior:'smooth',block:'start'});}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}function attr(s){return esc(s);}
-function submitExamAndShowResults(){ const wasSubmitted=submitted; submitExam(); if(!wasSubmitted){ $('submitBtnBottom').disabled=true; $('submitBtnBottom').classList.add('opacity-50'); requestAnimationFrame(()=>$('result').scrollIntoView({behavior:'smooth',block:'start'})); } }
-$('startBtn').onclick=startExam;$('retryBtn').onclick=startExam;$('submitBtn').onclick=submitExamAndShowResults;$('submitBtnBottom').onclick=submitExamAndShowResults;$('adminToggle').onclick=toggleAdmin;
+function submitExam(){
+  if(submitted) return false;
+  try {
+    let correct=0;
+    const correctItems=[],wrongItems=[];
+    exam.forEach((q,qi)=>{
+      const selected=[...document.querySelectorAll(`input[name="q-${qi}"]:checked`)].map(x=>+x.value).sort();
+      const right=Array.isArray(q.answer)?[...q.answer].filter(Number.isInteger).sort():[];
+      const ok=right.length>0&&selected.length===right.length&&selected.every((v,i)=>v===right[i]);
+      if(ok)correct++;
+      (ok?correctItems:wrongItems).push({q,qi,selected,right});
+      (q.options||[]).forEach((_,oi)=>{
+        const el=$(`choice-${qi}-${oi}`);
+        if(!el)return;
+        if(right.includes(oi))el.classList.add('correct');
+        if(selected.includes(oi)&&!right.includes(oi))el.classList.add('wrong');
+      });
+      const fb=$(`feedback-${qi}`);
+      if(fb){fb.classList.remove('hidden');fb.innerHTML=`<b class="${ok?'text-green-700':'text-red-700'}">${ok?'答對！':'答錯。'}</b> 正確答案：${right.length?right.map(i=>'ABCD'[i]).join('、'):'題庫未設定'}`;}
+    });
+    const renderSummary=(items,kind)=>items.length?items.map(({q,qi,selected,right})=>{
+      const type=q.type==='single_choice'?'單選題':'複選題',your=selected.length?selected.map(i=>'ABCD'[i]).join('、'):'未作答',answer=right.length?right.map(i=>'ABCD'[i]).join('、'):'題庫未設定';
+      return `<article class="rounded-xl border p-3 text-sm ${kind==='correct'?'border-green-200 bg-green-50':'border-red-200 bg-red-50'}"><p class="font-black">【${type}】原始題號：${esc(q.id)}</p><p class="mt-1 leading-6">${esc(q.question)}</p><p class="mt-2 ${kind==='correct'?'text-green-800':'text-red-700'}">你的答案：${your}</p>${kind==='wrong'?`<p class="mt-1 font-bold text-green-800">正確答案：${answer}</p>`:''}<a href="#choice-${qi}-0" class="mt-2 inline-block font-bold text-teal-700 underline">查看原題</a></article>`;
+    }).join(''):'<p class="rounded-xl bg-slate-50 p-3 text-sm text-slate-500">沒有題目。</p>';
+    const score=$('score'),scoreText=$('scoreText'),correctCount=$('correctSummaryCount'),wrongCount=$('wrongSummaryCount'),correctSummary=$('correctSummary'),wrongSummary=$('wrongSummary'),result=$('result');
+    if(!score||!scoreText||!correctCount||!wrongCount||!correctSummary||!wrongSummary||!result)throw Error('成績區元件未載入');
+    score.textContent=`${correct*2} 分`;scoreText.textContent=`答對 ${correct} / ${exam.length} 題`;correctCount.textContent=`共 ${correctItems.length} 題`;wrongCount.textContent=`共 ${wrongItems.length} 題`;correctSummary.innerHTML=renderSummary(correctItems,'correct');wrongSummary.innerHTML=renderSummary(wrongItems,'wrong');result.classList.remove('hidden');
+    submitted=true;
+    const topButton=$('submitBtn');if(topButton){topButton.disabled=true;topButton.classList.add('opacity-50');}
+    return true;
+  } catch(err) { console.error('submit exam failed',err); alert('交卷時發生問題，請再按一次交卷。你的作答不會遺失。'); return false; }
+}
+function submitExamAndShowResults(){ if(submitExam()){ const bottom=$('submitBtnBottom'),floating=$('floatingSubmit'),result=$('result');if(bottom){bottom.disabled=true;bottom.classList.add('opacity-50');}if(floating)floating.classList.add('hidden');requestAnimationFrame(()=>result.scrollIntoView({behavior:'smooth',block:'start'})); } }
+$('startBtn').onclick=startExam;$('retryBtn').onclick=startExam;$('submitBtn').onclick=submitExamAndShowResults;$('submitBtnBottom').onclick=submitExamAndShowResults;$('floatingSubmit').onclick=submitExamAndShowResults;$('adminToggle').onclick=toggleAdmin;
 $('addSingleBtn').onclick=()=>openEditor('single_choice');$('addMultipleBtn').onclick=()=>openEditor('multiple_choice');
 $('adminPasswordCancel').onclick=closeAdminLock;$('adminPasswordForm').onsubmit=e=>{e.preventDefault();if($('adminPasswordInput').value!==ADMIN_PASSWORD){$('adminPasswordError').classList.remove('hidden');$('adminPasswordInput').focus();return;}closeAdminLock();showAdmin(true);};
 ['filterType','filterNo','filterText'].forEach(id=>$(id).addEventListener('input',renderList));
