@@ -27,7 +27,7 @@
   <main class="mx-auto max-w-4xl px-4 pb-16 pt-6 sm:px-6">
     <header class="mb-6 flex items-start justify-between gap-3">
       <div><p class="text-sm font-semibold text-teal-700">URBAN RENEWAL EXAM</p><h1 class="text-2xl font-black tracking-tight sm:text-3xl">都市更新推動師模擬考試</h1></div>
-      <div class="flex flex-wrap justify-end gap-2"><button id="staffToggle" class="rounded-xl bg-indigo-700 px-4 py-2 text-sm font-bold text-white shadow hover:bg-indigo-800">員工副後台</button><button id="adminToggle" class="rounded-xl bg-slate-800 px-4 py-2 text-sm font-bold text-white shadow hover:bg-slate-700">主後台管理</button></div>
+      <div class="flex flex-wrap justify-end gap-2"><button id="staffToggle" class="rounded-xl bg-indigo-700 px-4 py-2 text-sm font-bold text-white shadow hover:bg-indigo-800">副後台管理</button><button id="adminToggle" class="rounded-xl bg-slate-800 px-4 py-2 text-sm font-bold text-white shadow hover:bg-slate-700">主後台管理</button></div>
     </header>
 
     <section id="examView">
@@ -47,7 +47,7 @@
 
     <section id="adminView" class="hidden">
       <div class="rounded-3xl border border-indigo-100 bg-white p-5 shadow-sm">
-        <div class="flex flex-wrap items-center justify-between gap-3"><div><h2 class="text-xl font-black text-indigo-950">後台題庫管理</h2><p class="text-sm text-slate-500">修改或新增後會立即儲存於這台裝置。</p></div><div class="flex flex-wrap gap-2"><button id="addSingleBtn" type="button" class="rounded-xl bg-emerald-600 px-3 py-2 text-sm font-bold text-white">新增單選題</button><button id="addMultipleBtn" type="button" class="rounded-xl bg-violet-600 px-3 py-2 text-sm font-bold text-white">新增複選題</button><label class="cursor-pointer rounded-xl bg-indigo-100 px-3 py-2 text-sm font-bold text-indigo-800">匯入題庫<input id="importInput" type="file" accept="application/json,.json" multiple class="hidden"></label><button id="exportBtn" class="rounded-xl bg-indigo-700 px-3 py-2 text-sm font-bold text-white">匯出最新題庫</button></div></div>
+        <div class="flex flex-wrap items-center justify-between gap-3"><div><h2 class="text-xl font-black text-indigo-950">後台題庫管理</h2><p class="text-sm text-slate-500">員工副後台的新增、修改與刪除會同步給所有使用者。</p><p id="sharedQuestionStatus" class="mt-1 text-sm font-bold text-indigo-700">共用題庫連線中…</p></div><div class="flex flex-wrap gap-2"><button id="addSingleBtn" type="button" class="rounded-xl bg-emerald-600 px-3 py-2 text-sm font-bold text-white">新增單選題</button><button id="addMultipleBtn" type="button" class="rounded-xl bg-violet-600 px-3 py-2 text-sm font-bold text-white">新增複選題</button><label class="cursor-pointer rounded-xl bg-indigo-100 px-3 py-2 text-sm font-bold text-indigo-800">匯入題庫<input id="importInput" type="file" accept="application/json,.json" multiple class="hidden"></label><button id="exportBtn" class="rounded-xl bg-indigo-700 px-3 py-2 text-sm font-bold text-white">匯出最新題庫</button></div></div>
         <div class="mt-5 grid gap-3 sm:grid-cols-3"><select id="filterType" class="rounded-xl border p-3"><option value="all">全部類型</option><option value="single_choice">單選題</option><option value="multiple_choice">複選題</option></select><input id="filterNo" inputmode="numeric" placeholder="依原始題號搜尋" class="rounded-xl border p-3"><input id="filterText" placeholder="搜尋題目文字" class="rounded-xl border p-3"></div>
         <div id="questionList" class="mt-5 max-h-80 space-y-2 overflow-y-auto"></div>
       </div>
@@ -127,7 +127,7 @@ function applyQuestionFixes(data) {
 }
 async function initialBank() { const bytes=Uint8Array.from(atob(INITIAL_QUESTION_BANK_GZIP_BASE64.join('')),c=>c.charCodeAt(0)); if ('DecompressionStream' in window) { const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip')); return JSON.parse(await new Response(stream).text()); } if (window.pako) return JSON.parse(new TextDecoder().decode(window.pako.ungzip(bytes))); throw new Error('此瀏覽器無法解壓題庫，請確認網路連線後重新開啟。'); }
 async function init() { const saved=localStorage.getItem(STORAGE_KEY), verified=localStorage.getItem(VERIFIED_BANK_MARKER); let localBank=null; try { localBank=saved ? normalizeBank(JSON.parse(saved)) : null; } catch (_) {} const allQuestions=localBank ? [...localBank.single_choice,...localBank.multiple_choice] : []; const isEmpty=!localBank || !allQuestions.length || allQuestions.every(q=>!q.question.trim()); const needsVerifiedRefresh=verified!==VERIFIED_BANK_VERSION; bank=isEmpty ? applyQuestionFixes(await initialBank()) : (needsVerifiedRefresh ? applyQuestionFixes(localBank) : localBank); if (isEmpty || needsVerifiedRefresh) { save(); localStorage.setItem(VERIFIED_BANK_MARKER,VERIFIED_BANK_VERSION); } refreshInfo(); $('startBtn').disabled=false; $('startBtn').textContent='開始測驗'; }
-function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(bank)); }
+function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(bank)); window.syncSharedQuestionBank?.(bank); }
 function refreshInfo() { $('bankInfo').textContent=`目前題庫：單選 ${bank.single_choice.length} 題／複選 ${bank.multiple_choice.length} 題`; }
 function shuffle(a) { return [...a].sort(()=>Math.random()-.5); }
 function startExam() {
@@ -188,7 +188,7 @@ function submitExam(){
 function submitExamAndShowResults(){ if(submitExam()){ const bottom=$('submitBtnBottom'),floating=$('floatingSubmit'),result=$('result');if(bottom){bottom.disabled=true;bottom.classList.add('opacity-50');}if(floating)floating.classList.add('hidden');requestAnimationFrame(()=>result.scrollIntoView({behavior:'smooth',block:'start'})); } }
 $('startBtn').onclick=startExam;$('retryBtn').onclick=startExam;$('submitBtn').onclick=submitExamAndShowResults;$('submitBtnBottom').onclick=submitExamAndShowResults;$('floatingSubmit').onclick=submitExamAndShowResults;$('adminToggle').onclick=toggleAdmin;$('staffToggle').onclick=toggleAdmin;
 $('addSingleBtn').onclick=()=>openEditor('single_choice');$('addMultipleBtn').onclick=()=>openEditor('multiple_choice');
-$('adminPasswordCancel').onclick=closeAdminLock;$('adminPasswordForm').onsubmit=e=>{e.preventDefault();if($('adminPasswordInput').value!==ADMIN_PASSWORD){$('adminPasswordError').classList.remove('hidden');$('adminPasswordInput').focus();return;}closeAdminLock();showAdmin(true);};
+$('adminPasswordCancel').onclick=closeAdminLock;$('adminPasswordForm').onsubmit=e=>{e.preventDefault();if($('adminPasswordInput').value!==ADMIN_PASSWORD){$('adminPasswordError').classList.remove('hidden');$('adminPasswordInput').focus();return;}sessionStorage.setItem('staffAdminVerified','true');closeAdminLock();showAdmin(true);};
 ['filterType','filterNo','filterText'].forEach(id=>$(id).addEventListener('input',renderList));
 $('editor').onsubmit=e=>{e.preventDefault();const type=$('editType').value,indexToken=$('editIndex').value,isNew=indexToken==='new',index=Number(indexToken),answers=[...document.querySelectorAll('input[name="correct-answer"]:checked')].map(x=>+x.value);if(!answers.length)return alert('請選擇正確答案。');const data={id:isNew?nextQuestionId(type):bank[type][index].id,question:$('editQuestion').value.trim(),options:[...document.querySelectorAll('.option-input')].map(x=>x.value.trim()),answer:answers};if(!data.question||data.options.some(x=>!x))return alert('請填寫題目與四個選項。');if(isNew){bank[type].push(data);$('editIndex').value=String(bank[type].length-1);$('deleteBtn').classList.remove('hidden');$('editTitle').textContent=`編輯${type==='single_choice'?'單選':'複選'}題｜原始題號：${data.id}`;}else bank[type][index]=data;save();refreshInfo();renderList();alert(isNew?'已新增題目。':'已儲存修改。');};
 $('deleteBtn').onclick=()=>{const type=$('editType').value,index=Number($('editIndex').value),q=bank[type][index];if(!q)return;if(!confirm(`確定要刪除原始題號 ${q.id} 嗎？此操作會同步儲存於本機題庫。`))return;bank[type].splice(index,1);save();refreshInfo();renderList();$('editor').classList.add('hidden');alert('已刪除題目。');};
@@ -218,6 +218,7 @@ init().catch(err=>{ console.error(err); $('bankInfo').textContent='題庫載入�
   const provider = new GoogleAuthProvider();
   provider.setCustomParameters({ prompt: 'select_account' });
   const configRef = doc(db, 'siteConfig', 'global');
+  const questionBankRef = doc(db, 'questionBank', 'global');
   let siteIsOpen = null;
   let adminUser = null;
   let receivedInitialSiteStatus = false;
@@ -270,6 +271,26 @@ init().catch(err=>{ console.error(err); $('bankInfo').textContent='題庫載入�
     const status = document.getElementById('remoteSiteStatus');
     if (status) status.textContent = siteIsOpen === true ? '目前狀態：開放中' : siteIsOpen === false ? '目前狀態：暫停中' : '目前狀態：確認中';
   }
+
+  function setSharedQuestionStatus(text, isError = false) {
+    const status = document.getElementById('sharedQuestionStatus');
+    if (!status) return;
+    status.textContent = text;
+    status.className = `mt-1 text-sm font-bold ${isError ? 'text-red-700' : 'text-indigo-700'}`;
+  }
+
+  // 副後台驗證成功後，將完整題庫寫入共用雲端資料；主後台開關仍採 Google 驗證。
+  window.syncSharedQuestionBank = async updatedBank => {
+    if (sessionStorage.getItem('staffAdminVerified') !== 'true') return;
+    setSharedQuestionStatus('正在同步所有使用者的題庫…');
+    try {
+      await setDoc(questionBankRef, { bank: updatedBank, staffPassword: '0512', updatedAt: serverTimestamp() });
+      setSharedQuestionStatus('已同步所有使用者的題庫。');
+    } catch (error) {
+      console.error('Unable to sync shared question bank', error);
+      setSharedQuestionStatus('同步失敗，請再儲存一次。', true);
+    }
+  };
 
   async function setSiteOpen(open) {
     if (!isAdmin(auth.currentUser)) { alert('此帳號沒有管理權限。'); return; }
@@ -345,6 +366,27 @@ init().catch(err=>{ console.error(err); $('bankInfo').textContent='題庫載入�
       siteIsOpen = true;
       refreshGate();
     }
+  });
+
+  onSnapshot(questionBankRef, snapshot => {
+    const remoteBank = snapshot.exists() ? snapshot.data().bank : null;
+    if (!remoteBank || !Array.isArray(remoteBank.single_choice) || !Array.isArray(remoteBank.multiple_choice)) {
+      setSharedQuestionStatus('尚未建立共用題庫；首次儲存後會開始同步。');
+      return;
+    }
+    try {
+      bank = normalizeBank(remoteBank);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(bank));
+      refreshInfo();
+      if (!document.getElementById('adminView').classList.contains('hidden')) renderList();
+      setSharedQuestionStatus('已載入所有使用者共用題庫。');
+    } catch (error) {
+      console.error('Unable to load shared question bank', error);
+      setSharedQuestionStatus('共用題庫資料格式錯誤。', true);
+    }
+  }, error => {
+    console.error('Unable to listen shared question bank', error);
+    setSharedQuestionStatus('共用題庫連線失敗，暫時使用本機題庫。', true);
   });
 </script>
 </body>
