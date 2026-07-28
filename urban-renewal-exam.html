@@ -223,6 +223,7 @@ init().catch(err=>{ console.error(err); $('bankInfo').textContent='題庫載入�
 
   const gate = document.createElement('div');
   gate.id = 'siteGate';
+  gate.classList.add('hidden');
   document.body.append(gate);
   const isAdmin = user => Boolean(user && user.email === ADMIN_EMAIL && user.emailVerified);
 
@@ -240,7 +241,8 @@ init().catch(err=>{ console.error(err); $('bankInfo').textContent='題庫載入�
 
   function refreshGate() {
     if (siteIsOpen === true) { gate.classList.add('hidden'); return; }
-    if (siteIsOpen === null) { drawGate('正在確認網站狀態…'); return; }
+    // 讀取狀態期間不阻擋測驗；只有伺服器明確回覆「暫停」才關閉網站。
+    if (siteIsOpen === null) { gate.classList.add('hidden'); return; }
     const actions = isAdmin(adminUser)
       ? `<div class="mt-6 space-y-3"><button id="openSiteNow" class="w-full rounded-xl bg-emerald-400 px-4 py-3 font-black text-emerald-950">立即開放網站</button><button id="signOutAdmin" class="w-full rounded-xl border border-white/30 px-4 py-3 font-bold">登出管理員</button></div>`
       : `<button id="gateAdminLogin" class="mt-6 w-full rounded-xl bg-white px-4 py-3 font-black text-slate-900">管理員以 Google 登入</button>`;
