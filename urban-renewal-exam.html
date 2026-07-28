@@ -18,6 +18,8 @@
     .correct { background:#dcfce7!important; border-color:#22c55e!important; }
     .wrong { background:#fee2e2!important; border-color:#ef4444!important; }
     #floatingSubmit { padding-bottom: max(0.75rem, env(safe-area-inset-bottom)); }
+    #siteGate { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 1.5rem; background: rgba(15, 23, 42, .94); color: #fff; }
+    #siteGate .site-gate-card { width: min(100%, 30rem); border: 1px solid rgba(255,255,255,.15); border-radius: 1.5rem; background: #172554; padding: 2rem; text-align: center; box-shadow: 0 20px 55px rgba(0,0,0,.35); }
   </style>
 </head>
 <body class="min-h-screen text-slate-800">
@@ -192,6 +194,136 @@ $('deleteBtn').onclick=()=>{const type=$('editType').value,index=Number($('editI
 $('exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify(bank,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='urban-renewal-question-bank.json';a.click();URL.revokeObjectURL(a.href);};
 $('importInput').onchange=async e=>{try{const files=[...e.target.files];if(!files.length)return;const merged={single_choice:[],multiple_choice:[]};for(const f of files){const d=JSON.parse(await f.text()),n=normalizeBank(d);merged.single_choice.push(...n.single_choice);merged.multiple_choice.push(...n.multiple_choice);}if(!merged.single_choice.length&&!merged.multiple_choice.length)throw Error('找不到 single_choice 或 multiple_choice 題目。');bank=merged;save();refreshInfo();renderList();$('editor').classList.add('hidden');alert(`已匯入：單選 ${bank.single_choice.length} 題、複選 ${bank.multiple_choice.length} 題。`);}catch(err){alert('匯入失敗：'+err.message)}finally{e.target.value='';}};
 init().catch(err=>{ console.error(err); $('bankInfo').textContent='題庫載入失敗：請確認手機已連網後重新開啟。'; $('startBtn').textContent='題庫載入失敗'; });
+</script>
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+  import { getFirestore, doc, onSnapshot, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+  // Firebase 網頁設定值不是密碼；真正的權限由 Firestore 安全規則驗證。
+  const firebaseConfig = {
+    apiKey: 'AIzaSyD2Vt6AXNTPYmo5E5j8qPhjup0X-715W14',
+    authDomain: 'urban-renewal-exam.firebaseapp.com',
+    projectId: 'urban-renewal-exam',
+    storageBucket: 'urban-renewal-exam.firebasestorage.app',
+    messagingSenderId: '55532864428',
+    appId: '1:55532864428:web:7657b70db313e9cf0bb009',
+    measurementId: 'G-LCV4C1W10D'
+  };
+  const ADMIN_EMAIL = 'skyfree357@gmail.com';
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: 'select_account' });
+  const configRef = doc(db, 'siteConfig', 'global');
+  let siteIsOpen = null;
+  let adminUser = null;
+
+  const gate = document.createElement('div');
+  gate.id = 'siteGate';
+  document.body.append(gate);
+  const isAdmin = user => Boolean(user && user.email === ADMIN_EMAIL && user.emailVerified);
+
+  function showAdminView(show) {
+    document.getElementById('examView').classList.toggle('hidden', show);
+    document.getElementById('adminView').classList.toggle('hidden', !show);
+    document.getElementById('adminToggle').textContent = show ? '返回前台測驗' : '進入後台管理';
+    if (show && typeof window.renderList === 'function') window.renderList();
+  }
+
+  function drawGate(message, actions = '') {
+    gate.innerHTML = `<div class="site-gate-card"><p class="text-sm font-bold tracking-wider text-cyan-200">URBAN RENEWAL EXAM</p><h1 class="mt-3 text-2xl font-black">${message}</h1><p class="mt-3 text-sm leading-6 text-slate-200">系統目前暫停提供測驗服務。</p>${actions}</div>`;
+    gate.classList.remove('hidden');
+  }
+
+  function refreshGate() {
+    if (siteIsOpen === true) { gate.classList.add('hidden'); return; }
+    if (siteIsOpen === null) { drawGate('正在確認網站狀態…'); return; }
+    const actions = isAdmin(adminUser)
+      ? `<div class="mt-6 space-y-3"><button id="openSiteNow" class="w-full rounded-xl bg-emerald-400 px-4 py-3 font-black text-emerald-950">立即開放網站</button><button id="signOutAdmin" class="w-full rounded-xl border border-white/30 px-4 py-3 font-bold">登出管理員</button></div>`
+      : `<button id="gateAdminLogin" class="mt-6 w-full rounded-xl bg-white px-4 py-3 font-black text-slate-900">管理員以 Google 登入</button>`;
+    drawGate('網站目前暫停開放', actions);
+    document.getElementById('gateAdminLogin')?.addEventListener('click', () => requestSecureAdmin());
+    document.getElementById('openSiteNow')?.addEventListener('click', () => setSiteOpen(true));
+    document.getElementById('signOutAdmin')?.addEventListener('click', () => signOut(auth));
+  }
+
+  function ensureControlPanel() {
+    if (document.getElementById('remoteSiteControl')) return;
+    const panel = document.createElement('section');
+    panel.id = 'remoteSiteControl';
+    panel.className = 'mb-5 rounded-3xl border border-amber-200 bg-amber-50 p-5 shadow-sm';
+    panel.innerHTML = `<div class="flex flex-wrap items-center justify-between gap-3"><div><h2 class="text-xl font-black text-amber-950">即時網站開關</h2><p id="remoteSiteStatus" class="mt-1 text-sm text-amber-900"></p></div><div class="flex flex-wrap gap-2"><button id="closeSiteNow" class="rounded-xl bg-red-600 px-4 py-3 text-sm font-bold text-white">立即暫停網站</button><button id="openSitePanel" class="rounded-xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white">立即開放網站</button><button id="logoutGoogle" class="rounded-xl bg-slate-700 px-4 py-3 text-sm font-bold text-white">Google 登出</button></div></div>`;
+    document.getElementById('adminView').prepend(panel);
+    document.getElementById('closeSiteNow').onclick = () => setSiteOpen(false);
+    document.getElementById('openSitePanel').onclick = () => setSiteOpen(true);
+    document.getElementById('logoutGoogle').onclick = () => signOut(auth);
+    updateControlPanel();
+  }
+
+  function updateControlPanel() {
+    const status = document.getElementById('remoteSiteStatus');
+    if (status) status.textContent = siteIsOpen === true ? '目前狀態：開放中' : siteIsOpen === false ? '目前狀態：暫停中' : '目前狀態：確認中';
+  }
+
+  async function setSiteOpen(open) {
+    if (!isAdmin(auth.currentUser)) { alert('此帳號沒有管理權限。'); return; }
+    try {
+      await setDoc(configRef, { isOpen: open, updatedAt: serverTimestamp() }, { merge: true });
+    } catch (error) {
+      console.error(error);
+      alert('狀態更新失敗，請確認 Google 登入後再試。');
+    }
+  }
+
+  async function requestSecureAdmin() {
+    try {
+      if (!isAdmin(auth.currentUser)) {
+        // 手機瀏覽器常限制彈出視窗，改用同樣安全的整頁 Google 登入流程。
+        if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+          await signInWithRedirect(auth, provider);
+          return;
+        }
+        await signInWithPopup(auth, provider);
+      }
+      if (!isAdmin(auth.currentUser)) {
+        await signOut(auth);
+        alert('這個 Google 帳號沒有後台權限。');
+        return;
+      }
+      ensureControlPanel();
+      if (siteIsOpen === true) showAdminView(true);
+      refreshGate();
+    } catch (error) {
+      console.error(error);
+      alert('Google 登入未完成，請再試一次。');
+    }
+  }
+
+  // 以 Google 已驗證帳號取代原本瀏覽器端的 4 位數密碼。
+  document.getElementById('adminToggle').onclick = () => {
+    if (!document.getElementById('adminView').classList.contains('hidden')) return showAdminView(false);
+    requestSecureAdmin();
+  };
+
+  onAuthStateChanged(auth, user => {
+    adminUser = isAdmin(user) ? user : null;
+    if (adminUser) ensureControlPanel();
+    updateControlPanel();
+    refreshGate();
+  });
+
+  onSnapshot(configRef, snapshot => {
+    siteIsOpen = snapshot.exists() ? snapshot.data().isOpen !== false : null;
+    updateControlPanel();
+    refreshGate();
+  }, error => {
+    console.error('Unable to read maintenance status', error);
+    siteIsOpen = false; // 無法確認狀態時採安全的暫停模式。
+    drawGate('暫時無法確認網站狀態', '<button id="retrySiteStatus" class="mt-6 w-full rounded-xl bg-white px-4 py-3 font-black text-slate-900">重新整理</button>');
+    document.getElementById('retrySiteStatus').onclick = () => location.reload();
+  });
 </script>
 </body>
 </html>
