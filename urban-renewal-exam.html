@@ -226,7 +226,7 @@ init().catch(err=>{ console.error(err); $('bankInfo').textContent='題庫載入�
   let siteIsOpen = null;
   let adminUser = null;
   let receivedInitialSiteStatus = false;
-  let mainAdminMode = false;
+  let mainAdminMode = sessionStorage.getItem('pendingMainAdmin') === 'true';
 
   const gate = document.createElement('div');
   gate.id = 'siteGate';
@@ -311,23 +311,18 @@ init().catch(err=>{ console.error(err); $('bankInfo').textContent='題庫載入�
   async function requestSecureAdmin() {
     try {
       if (!isAdmin(auth.currentUser)) {
-        // 手機瀏覽器常限制彈出視窗，改用同樣安全的整頁 Google 登入流程。
-        if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-          await signInWithRedirect(auth, provider);
-          return;
-        }
-        await signInWithPopup(auth, provider);
-      }
-      if (!isAdmin(auth.currentUser)) {
-        await signOut(auth);
-        alert('這個 Google 帳號沒有後台權限。');
+        // 改用整頁登入，避免部分瀏覽器封鎖彈出視窗造成登入失敗。
+        sessionStorage.setItem('pendingMainAdmin', 'true');
+        await signInWithRedirect(auth, provider);
         return;
       }
+      sessionStorage.removeItem('pendingMainAdmin');
       mainAdminMode = true;
       ensureControlPanel();
       if (siteIsOpen === true) showAdminView(true);
       refreshGate();
     } catch (error) {
+      sessionStorage.removeItem('pendingMainAdmin');
       console.error(error);
       alert('Google 登入未完成，請再試一次。');
     }
@@ -352,7 +347,11 @@ init().catch(err=>{ console.error(err); $('bankInfo').textContent='題庫載入�
 
   onAuthStateChanged(auth, user => {
     adminUser = isAdmin(user) ? user : null;
-    if (adminUser && mainAdminMode) ensureControlPanel();
+    if (adminUser && mainAdminMode) {
+      sessionStorage.removeItem('pendingMainAdmin');
+      ensureControlPanel();
+      if (siteIsOpen === true) showAdminView(true);
+    }
     updateControlPanel();
     refreshGate();
   });
@@ -361,6 +360,7 @@ init().catch(err=>{ console.error(err); $('bankInfo').textContent='題庫載入�
     receivedInitialSiteStatus = true;
     siteIsOpen = snapshot.exists() ? snapshot.data().isOpen !== false : true;
     updateControlPanel();
+    if (adminUser && mainAdminMode && siteIsOpen === true) showAdminView(true);
     refreshGate();
   }
 
