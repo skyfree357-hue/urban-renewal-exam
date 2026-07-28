@@ -198,7 +198,7 @@ init().catch(err=>{ console.error(err); $('bankInfo').textContent='題庫載入�
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
   import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-  import { getFirestore, doc, onSnapshot, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+  import { getFirestore, doc, getDoc, onSnapshot, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
   // Firebase 網頁設定值不是密碼；真正的權限由 Firestore 安全規則驗證。
   const firebaseConfig = {
@@ -219,6 +219,7 @@ init().catch(err=>{ console.error(err); $('bankInfo').textContent='題庫載入�
   const configRef = doc(db, 'siteConfig', 'global');
   let siteIsOpen = null;
   let adminUser = null;
+  let receivedInitialSiteStatus = false;
 
   const gate = document.createElement('div');
   gate.id = 'siteGate';
@@ -314,15 +315,33 @@ init().catch(err=>{ console.error(err); $('bankInfo').textContent='題庫載入�
     refreshGate();
   });
 
-  onSnapshot(configRef, snapshot => {
-    siteIsOpen = snapshot.exists() ? snapshot.data().isOpen !== false : null;
+  function applySiteStatus(snapshot) {
+    receivedInitialSiteStatus = true;
+    siteIsOpen = snapshot.exists() ? snapshot.data().isOpen !== false : true;
     updateControlPanel();
     refreshGate();
-  }, error => {
+  }
+
+  // 先以一次性讀取取得狀態；部分手機網路會延後建立即時連線，不能因此把整個網站卡住。
+  getDoc(configRef).then(applySiteStatus).catch(error => {
+    console.error('Unable to read initial maintenance status', error);
+    receivedInitialSiteStatus = true;
+    siteIsOpen = true;
+    refreshGate();
+  });
+  setTimeout(() => {
+    if (!receivedInitialSiteStatus) {
+      siteIsOpen = true;
+      refreshGate();
+    }
+  }, 3500);
+
+  onSnapshot(configRef, applySiteStatus, error => {
     console.error('Unable to read maintenance status', error);
-    siteIsOpen = false; // 無法確認狀態時採安全的暫停模式。
-    drawGate('暫時無法確認網站狀態', '<button id="retrySiteStatus" class="mt-6 w-full rounded-xl bg-white px-4 py-3 font-black text-slate-900">重新整理</button>');
-    document.getElementById('retrySiteStatus').onclick = () => location.reload();
+    if (!receivedInitialSiteStatus) {
+      siteIsOpen = true;
+      refreshGate();
+    }
   });
 </script>
 </body>
