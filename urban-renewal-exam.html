@@ -27,7 +27,7 @@
   <main class="mx-auto max-w-4xl px-4 pb-16 pt-6 sm:px-6">
     <header class="mb-6 flex items-start justify-between gap-3">
       <div><p class="text-sm font-semibold text-teal-700">URBAN RENEWAL EXAM</p><h1 class="text-2xl font-black tracking-tight sm:text-3xl">都市更新推動師模擬考試</h1></div>
-      <button id="adminToggle" class="rounded-xl bg-slate-800 px-4 py-2 text-sm font-bold text-white shadow hover:bg-slate-700">進入後台管理</button>
+      <div class="flex flex-wrap justify-end gap-2"><button id="staffToggle" class="rounded-xl bg-indigo-700 px-4 py-2 text-sm font-bold text-white shadow hover:bg-indigo-800">員工副後台</button><button id="adminToggle" class="rounded-xl bg-slate-800 px-4 py-2 text-sm font-bold text-white shadow hover:bg-slate-700">主後台管理</button></div>
     </header>
 
     <section id="examView">
@@ -186,7 +186,7 @@ function submitExam(){
   } catch(err) { console.error('submit exam failed',err); alert('交卷時發生問題，請再按一次交卷。你的作答不會遺失。'); return false; }
 }
 function submitExamAndShowResults(){ if(submitExam()){ const bottom=$('submitBtnBottom'),floating=$('floatingSubmit'),result=$('result');if(bottom){bottom.disabled=true;bottom.classList.add('opacity-50');}if(floating)floating.classList.add('hidden');requestAnimationFrame(()=>result.scrollIntoView({behavior:'smooth',block:'start'})); } }
-$('startBtn').onclick=startExam;$('retryBtn').onclick=startExam;$('submitBtn').onclick=submitExamAndShowResults;$('submitBtnBottom').onclick=submitExamAndShowResults;$('floatingSubmit').onclick=submitExamAndShowResults;$('adminToggle').onclick=toggleAdmin;
+$('startBtn').onclick=startExam;$('retryBtn').onclick=startExam;$('submitBtn').onclick=submitExamAndShowResults;$('submitBtnBottom').onclick=submitExamAndShowResults;$('floatingSubmit').onclick=submitExamAndShowResults;$('adminToggle').onclick=toggleAdmin;$('staffToggle').onclick=toggleAdmin;
 $('addSingleBtn').onclick=()=>openEditor('single_choice');$('addMultipleBtn').onclick=()=>openEditor('multiple_choice');
 $('adminPasswordCancel').onclick=closeAdminLock;$('adminPasswordForm').onsubmit=e=>{e.preventDefault();if($('adminPasswordInput').value!==ADMIN_PASSWORD){$('adminPasswordError').classList.remove('hidden');$('adminPasswordInput').focus();return;}closeAdminLock();showAdmin(true);};
 ['filterType','filterNo','filterText'].forEach(id=>$(id).addEventListener('input',renderList));
