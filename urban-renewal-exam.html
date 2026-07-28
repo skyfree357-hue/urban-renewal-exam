@@ -222,6 +222,7 @@ init().catch(err=>{ console.error(err); $('bankInfo').textContent='題庫載入�
   let siteIsOpen = null;
   let adminUser = null;
   let receivedInitialSiteStatus = false;
+  let mainAdminMode = false;
 
   const gate = document.createElement('div');
   gate.id = 'siteGate';
@@ -255,6 +256,7 @@ init().catch(err=>{ console.error(err); $('bankInfo').textContent='題庫載入�
   }
 
   function ensureControlPanel() {
+    if (!mainAdminMode) return;
     if (document.getElementById('remoteSiteControl')) return;
     const panel = document.createElement('section');
     panel.id = 'remoteSiteControl';
@@ -317,6 +319,7 @@ init().catch(err=>{ console.error(err); $('bankInfo').textContent='題庫載入�
         alert('這個 Google 帳號沒有後台權限。');
         return;
       }
+      mainAdminMode = true;
       ensureControlPanel();
       if (siteIsOpen === true) showAdminView(true);
       refreshGate();
@@ -332,9 +335,20 @@ init().catch(err=>{ console.error(err); $('bankInfo').textContent='題庫載入�
     requestSecureAdmin();
   };
 
+  document.getElementById('staffToggle').onclick = () => {
+    mainAdminMode = false;
+    document.getElementById('remoteSiteControl')?.remove();
+    if (!document.getElementById('adminView').classList.contains('hidden')) return showAdminView(false);
+    document.getElementById('adminPasswordInput').value = '';
+    document.getElementById('adminPasswordError').classList.add('hidden');
+    document.getElementById('adminPasswordModal').classList.remove('hidden');
+    document.getElementById('adminPasswordModal').classList.add('flex');
+    setTimeout(() => document.getElementById('adminPasswordInput').focus(), 0);
+  };
+
   onAuthStateChanged(auth, user => {
     adminUser = isAdmin(user) ? user : null;
-    if (adminUser) ensureControlPanel();
+    if (adminUser && mainAdminMode) ensureControlPanel();
     updateControlPanel();
     refreshGate();
   });
