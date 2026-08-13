@@ -32,11 +32,28 @@ async function loadBank(){
 }
 
 function selectMode(mode){
+  const running=state.questions.length>0&&!$('#runner').hidden;
+  if(running&&state.mode==='review'&&mode==='exam'&&Object.keys(state.graded).length){
+    alert('本次作答已顯示答案與詳解，不能切回考試模式；如需考試模式，請重新開始試卷。');
+    return;
+  }
   selectedMode=mode;
+  if(running){
+    state.mode=mode;
+    if(mode==='review'){
+      state.questions.forEach(q=>{
+        const answer=state.answers[q.id];
+        if(q.question_type==='multiple_choice'&&answer&&!state.graded[q.id]){
+          state.graded[q.id]={answer,isCorrect:answerIsCorrect(answer,q.official_answer)};
+        }
+      });
+    }
+  }
   document.querySelectorAll('[data-mode]').forEach(button=>button.classList.toggle('active',button.dataset.mode===mode));
   $('#mode-hint').textContent=mode==='review'
     ?'選定答案後立即判題並展開詳解；第一次作答會鎖定。'
     :'交卷前不顯示答案與詳解，可自由修改答案。';
+  if(running)render();
 }
 
 function refreshSubjects(){
@@ -87,7 +104,7 @@ function render(){
   const feedback=$('#instant-feedback');
   if(state.mode==='review'&&grade){
     feedback.hidden=false;
-    feedback.innerHTML=`<div class="instant-result ${grade.isCorrect?'correct-result':'wrong-result'}"><strong>${grade.isCorrect?'答對了':'答錯了'}</strong><span>你的答案：${grade.answer}　官方答案：${officialAnswerLabel(q.official_answer)}</span></div>${explanationHtml(q)}`;
+    feedback.innerHTML=`<div class="instant-result ${grade.isCorrect?'correct-result':'wrong-result'}"><strong>${grade.isCorrect?'答對了':'答錯了'}</strong><span>你的答案：${grade.answer}　官方答案：${officialAnswerLabel(q.official_answer)}</span><small class="answer-locked">答案已鎖定，請前往下一題。</small></div>${explanationHtml(q)}`;
   }else{feedback.hidden=true;feedback.innerHTML=''}
   $('#nav').innerHTML=state.questions.map((item,i)=>{
     const itemGrade=state.graded[item.id];
