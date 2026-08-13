@@ -20,6 +20,7 @@ textarea{width:100%;height:240px;padding:16px}.actions{display:flex;gap:8px;flex
 .review-options{display:grid;gap:7px;margin:12px 0}.review-option{position:relative;padding:10px 12px;border:1px solid #ddd7ca;border-radius:9px;background:#f7f4ee}.review-option span{float:right;font-size:13px;font-weight:700;color:#665f55}.review-option.official-option{border-color:var(--jade);background:#eaf5f1}.review-option.user-option:not(.official-option){border-color:var(--red);background:#fff0ee}
 .pending{background:#fff4d6;color:#765512;padding:14px;border-radius:10px}.explanation{margin-top:16px;border-left:4px solid var(--gold);padding:10px 18px;background:#faf8f3}
 .explanation h4{margin:18px 0 6px}.essay-answer{white-space:pre-line;line-height:1.85}
+.reference-button{display:block;margin:12px 0 4px;background:var(--jade);color:#fff}.reference-button[hidden]{display:none}
 .law-cards{display:grid;gap:.7rem}.law-card{border-left:4px solid var(--jade);background:#f2f6f3;padding:.8rem 1rem;border-radius:8px}.law-card p{margin:.35rem 0}.law-card small{color:#53605d}
 .law-change-alert{margin:8px 0 18px;padding:14px 16px;border:2px solid #c92d27;border-radius:10px;background:#fff0ef;color:#a51f1a}.law-change-alert strong{display:block;font-size:18px}.law-change-alert p{margin:8px 0 0;white-space:pre-line;line-height:1.7;font-weight:600}
 .law-review-pending{margin:8px 0 18px;padding:12px 15px;border:1px solid #d49a32;border-radius:10px;background:#fff7df;color:#765512}.law-review-pending p{margin:6px 0 0}

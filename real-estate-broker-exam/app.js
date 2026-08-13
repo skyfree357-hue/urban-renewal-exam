@@ -1,6 +1,6 @@
 let bank=[];
 let selectedMode='exam';
-let state={questions:[],index:0,answers:{},graded:{},marked:new Set(),started:0,mode:'exam'};
+let state={questions:[],index:0,answers:{},graded:{},revealed:new Set(),marked:new Set(),started:0,mode:'exam'};
 const $=selector=>document.querySelector(selector);
 
 async function init(){
@@ -82,7 +82,7 @@ function start(limit=100,random=false){
   const subject=$('#subject-select').value;
   let questions=bank.filter(q=>q.exam_year===year&&q.subject===subject);
   if(random) questions=[...questions].sort(()=>Math.random()-.5);
-  state={questions:questions.slice(0,limit),index:0,answers:{},graded:{},marked:new Set(),started:Date.now(),mode:selectedMode};
+  state={questions:questions.slice(0,limit),index:0,answers:{},graded:{},revealed:new Set(),marked:new Set(),started:Date.now(),mode:selectedMode};
   $('#empty').hidden=true;$('#result').hidden=true;$('#runner').hidden=false;render();
 }
 
@@ -101,10 +101,16 @@ function render(){
     const mark=grade&&letter===grade.answer?(grade.isCorrect?'✓ 答對':'✕ 答錯'):grade&&!grade.isCorrect&&answerIsCorrect(letter,q.official_answer)?'✓ 正解':'';
     return `<button class="${classes.join(' ')}" data-answer="${letter}" ${grade?'disabled':''}><b>${letter}.</b> ${q[`option_${letter.toLowerCase()}`]||'選項資料缺漏'}${mark?`<span class="answer-mark">${mark}</span>`:''}</button>`;
   }).join('');
+  const referenceButton=$('#show-reference');
+  referenceButton.hidden=!(state.mode==='review'&&q.question_type==='essay');
+  referenceButton.textContent=state.revealed.has(q.id)?'收合申論題參考答案':'查看申論題參考答案';
   const feedback=$('#instant-feedback');
   if(state.mode==='review'&&grade){
     feedback.hidden=false;
     feedback.innerHTML=`<div class="instant-result ${grade.isCorrect?'correct-result':'wrong-result'}"><strong>${grade.isCorrect?'答對了':'答錯了'}</strong><span>你的答案：${grade.answer}　官方答案：${officialAnswerLabel(q.official_answer)}</span><small class="answer-locked">答案已鎖定，請前往下一題。</small></div>${explanationHtml(q)}`;
+  }else if(state.mode==='review'&&q.question_type==='essay'&&state.revealed.has(q.id)){
+    feedback.hidden=false;
+    feedback.innerHTML=explanationHtml(q);
   }else{feedback.hidden=true;feedback.innerHTML=''}
   $('#nav').innerHTML=state.questions.map((item,i)=>{
     const itemGrade=state.graded[item.id];
@@ -125,6 +131,12 @@ $('#options').onclick=event=>{
   render();
 };
 $('#essay').oninput=event=>state.answers[state.questions[state.index].id]=event.target.value;
+$('#show-reference').onclick=()=>{
+  const q=state.questions[state.index];
+  if(state.mode!=='review'||q.question_type!=='essay')return;
+  state.revealed.has(q.id)?state.revealed.delete(q.id):state.revealed.add(q.id);
+  render();
+};
 $('#nav').onclick=event=>{const button=event.target.closest('[data-index]');if(button){state.index=Number(button.dataset.index);render()}};
 $('#prev').onclick=()=>{state.index=Math.max(0,state.index-1);render()};$('#next').onclick=()=>{state.index=Math.min(state.questions.length-1,state.index+1);render()};
 $('#mark').onclick=()=>{const id=state.questions[state.index].id;state.marked.has(id)?state.marked.delete(id):state.marked.add(id);render()};
