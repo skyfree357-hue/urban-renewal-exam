@@ -7,7 +7,7 @@ let state={questions:[],index:0,answers:{},graded:{},revealed:new Set(),marked:n
 const $=selector=>document.querySelector(selector);
 
 async function init(){
-  [bank,lawLibrary,glossary]=await Promise.all([loadBank(),loadJson('./data/law_library.json?v=20260816-2','laws'),loadJson('./data/glossary.json?v=20260816-2','terms')]);
+  [bank,lawLibrary,glossary]=await Promise.all([loadBank(),loadJson('./data/law_library.json?v=20260816-3','laws'),loadJson('./data/glossary.json?v=20260816-3','terms')]);
   const years=[...new Set(bank.map(q=>q.exam_year))].sort((a,b)=>b-a);
   $('#year-select').innerHTML=years.map(year=>`<option value="${year}">${year} 年</option>`).join('');
   $('#year-select').value=years[0];
@@ -67,7 +67,7 @@ function renderLawLibrary(){
     if(subject&&!(law.subjects||[]).includes(subject))return null;
     if(category&&!essayOnly&&law.category!==category)return null;
     const nameMatch=!query||`${law.law_name} ${law.category}`.toLowerCase().includes(query);
-    const articles=(law.articles||[]).filter(a=>(!essayOnly||a.essay_question_count>0)&&(nameMatch||`${a.article_no} ${a.content} ${a.plain_explanation}`.toLowerCase().includes(query)));
+    const articles=sortLawArticles((law.articles||[]).filter(a=>(!essayOnly||a.essay_question_count>0)&&(nameMatch||`${a.article_no} ${a.content} ${a.plain_explanation}`.toLowerCase().includes(query))),essayOnly);
     const displayCount=essayOnly?articles.reduce((n,a)=>n+a.essay_question_count,0):law.question_count;
     return articles.length?{...law,articles,displayCount}:null;
   }).filter(Boolean).sort((a,b)=>b.displayCount-a.displayCount||a.law_name.localeCompare(b.law_name,'zh-Hant'));
@@ -78,6 +78,10 @@ function renderLawLibrary(){
     const limit=query?law.articles.length:(lawArticleLimits.get(law.law_name)||30),shownArticles=law.articles.slice(0,limit);
     return `<details class="law-group" data-law-name="${escapeHtml(law.law_name)}" ${index===0?'open':''}><summary><div class="law-title"><b>${escapeHtml(law.law_name)}</b><span class="category-badge">${escapeHtml(law.category)}</span><span class="count-badge ${law.displayCount?'':'zero'}">${essayOnly?`申論命中 ${law.displayCount} 次`:law.question_count?`歷屆命中 ${law.question_count} 次`:'尚未出題'}</span></div><span class="law-source">${essayOnly?`申論涉及 ${law.articles.length} 條`:`共 ${law.article_count} 條`}｜展開閱讀</span></summary><div class="article-list">${shownArticles.map(article=>`<section class="article-item"><h4>第 ${escapeHtml(article.article_no)} 條 <span class="count-badge ${article.question_count?'':'zero'}">${essayOnly?`申論命中 ${article.essay_question_count} 題`:article.question_count?`命中 ${article.question_count} 題`:'未出題'}</span></h4><p class="official-text">${escapeHtml(article.content)}</p><div class="plain-box"><b>白話解釋</b>${escapeHtml(article.plain_explanation)}</div></section>`).join('')}${shownArticles.length<law.articles.length?`<button type="button" class="load-more" data-law-more="${escapeHtml(law.law_name)}">再顯示 ${Math.min(50,law.articles.length-shownArticles.length)} 條</button>`:''}<p class="law-source">官方來源：<a href="${escapeHtml(law.source_url)}" target="_blank" rel="noreferrer">全國法規資料庫</a></p></div></details>`;
   }).join('');
+}
+
+function sortLawArticles(articles,essayOnly){
+  return [...articles].sort((a,b)=>(essayOnly?b.essay_question_count-a.essay_question_count:b.question_count-a.question_count)||String(a.article_no).localeCompare(String(b.article_no),'zh-Hant',{numeric:true}));
 }
 
 function renderGlossary(){
