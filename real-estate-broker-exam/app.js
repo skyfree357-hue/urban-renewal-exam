@@ -9,7 +9,7 @@ let state={questions:[],index:0,answers:{},graded:{},revealed:new Set(),marked:n
 const $=selector=>document.querySelector(selector);
 
 async function init(){
-  [bank,lawLibrary,glossary]=await Promise.all([loadBank(),loadJson('./data/law_library.json?v=20260816-7','laws'),loadJson('./data/glossary.json?v=20260816-7','terms')]);
+  [bank,lawLibrary,glossary]=await Promise.all([loadBank(),loadJson('./data/law_library.json?v=20260816-8','laws'),loadJson('./data/glossary.json?v=20260816-8','terms')]);
   const years=[...new Set(bank.map(q=>q.exam_year))].sort((a,b)=>b-a);
   $('#year-select').innerHTML=years.map(year=>`<option value="${year}">${year} 年</option>`).join('');
   $('#year-select').value=years[0];
