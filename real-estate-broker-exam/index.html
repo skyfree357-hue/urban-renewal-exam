@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>地產國考練習室</title><link rel="stylesheet" href="./styles.css?v=20260816-1"></head><body>
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>地產國考練習室</title><link rel="stylesheet" href="./styles.css?v=20260816-5"></head><body>
 <header class="hero">
   <div class="hero-copy"><small>不動產經紀人｜AI 學習系統</small><h1>把每一次答錯，變成下一次拿分。</h1></div>
   <div class="hero-entry" role="navigation" aria-label="學習功能">
@@ -14,6 +14,7 @@
     <section class="exam"><div class="exam-head"><div><div class="selectors"><label>年份 <select id="year-select" aria-label="選擇年份"></select></label><label>科目 <select id="subject-select" aria-label="選擇科目"></select></label><fieldset class="mode-switch"><legend>作答模式</legend><button type="button" data-mode="exam" class="active">考試模式</button><button type="button" data-mode="review">複習模式</button></fieldset></div><h2 id="subject-title">民法概要</h2><p id="mode-hint">交卷前不顯示答案與詳解，可自由修改答案。</p></div><div id="timer">90:00</div></div><div id="empty"><p>官方真題已儲存在本機，不會在作答時重新抓網站。</p><button id="start">開始完整試卷</button></div><div id="runner" hidden><div class="progress"><i id="bar"></i></div><nav id="nav"></nav><article><p id="meta"></p><h3 id="question"></h3><div id="options"></div><textarea id="essay" hidden placeholder="依爭點、法律依據、涵攝、結論作答"></textarea><button type="button" id="show-reference" class="reference-button" hidden>查看申論題參考答案</button><div id="instant-feedback" hidden></div><div class="actions"><button id="prev">上一題</button><button id="mark">☆ 稍後再看</button><button id="next">下一題</button><button class="danger" id="submit">交卷</button></div></article></div><div id="result" hidden></div></section>
   </section>
   <section id="laws-view" class="study-view" hidden>
+    <button type="button" id="back-to-question" class="back-to-question" hidden>← 回到原題詳解</button>
     <div class="library-head"><div><p class="eyebrow">依 104～114 年考題排序</p><h2>完整法條及法條白話解釋</h2><p>條文來自全國法規資料庫；考過的條文依命中題數置前，未出題條文仍完整保留。</p></div><div id="law-summary" class="library-summary"></div></div>
     <div class="library-controls"><label>科目<select id="law-subject"></select></label><label>類型<select id="law-category"></select></label><label class="search-field">搜尋<input id="law-search" type="search" placeholder="法規名稱、條號或內容"></label></div>
     <div id="law-list" class="library-list"></div>
@@ -24,4 +25,4 @@
     <div id="term-list" class="term-grid"></div>
   </section>
 </main>
-<script src="./app.js?v=20260816-4"></script></body></html>
+<script src="./app.js?v=20260816-5"></script></body></html>
