@@ -4,12 +4,17 @@ let glossary=[];
 const lawArticleLimits=new Map();
 let lawJumpTarget=null;
 let lawReturnState=null;
+let lawTermLookup=new Map();
+let lawTermPattern=null;
+let pinnedLawTerm=null;
 let selectedMode='exam';
 let state={questions:[],index:0,answers:{},graded:{},revealed:new Set(),marked:new Set(),started:0,mode:'exam'};
 const $=selector=>document.querySelector(selector);
 
 async function init(){
-  [bank,lawLibrary,glossary]=await Promise.all([loadBank(),loadJson('./data/law_library.json?v=20260816-8','laws'),loadJson('./data/glossary.json?v=20260816-8','terms')]);
+  [bank,lawLibrary,glossary]=await Promise.all([loadBank(),loadJson('./data/law_library.json?v=20260820-1','laws'),loadJson('./data/glossary.json?v=20260820-1','terms')]);
+  buildLawTermLookup();
+  setupLawTermTooltip();
   const years=[...new Set(bank.map(q=>q.exam_year))].sort((a,b)=>b-a);
   $('#year-select').innerHTML=years.map(year=>`<option value="${year}">${year} 年</option>`).join('');
   $('#year-select').value=years[0];
@@ -66,6 +71,7 @@ function refreshTermCategories(){
 }
 
 function renderLawLibrary(){
+  hideLawTermTooltip(true);
   const subject=$('#law-subject').value,category=$('#law-category').value,query=$('#law-search').value.trim().toLowerCase();
   const essayOnly=category==='__essay__';
   const filtered=lawLibrary.map(law=>{
@@ -82,7 +88,7 @@ function renderLawLibrary(){
   if(!filtered.length){$('#law-list').innerHTML='<div class="empty-library">找不到符合條件的法條</div>';return}
   $('#law-list').innerHTML=filtered.map((law,index)=>{
     const limit=query?law.articles.length:(lawArticleLimits.get(law.law_name)||30),shownArticles=law.articles.slice(0,limit);
-    return `<details class="law-group" data-law-name="${escapeHtml(law.law_name)}" ${index===0?'open':''}><summary><div class="law-title"><b>${escapeHtml(law.law_name)}</b><span class="category-badge">${escapeHtml(law.category)}</span><span class="count-badge ${law.displayCount?'':'zero'}">${essayOnly?`申論命中 ${law.displayCount} 次`:law.question_count?`歷屆命中 ${law.question_count} 次`:'尚未出題'}</span></div><span class="law-source">${essayOnly?`申論涉及 ${law.articles.length} 條`:`共 ${law.article_count} 條`}｜展開閱讀</span></summary><div class="article-list">${shownArticles.map(article=>`<section class="article-item"><h4>第 ${escapeHtml(article.article_no)} 條 <span class="count-badge ${article.question_count?'':'zero'}">${essayOnly?`申論命中 ${article.essay_question_count} 題`:article.question_count?`命中 ${article.question_count} 題`:'未出題'}</span></h4><p class="official-text">${escapeHtml(article.content)}</p>${articleExplanationDetails(article)}</section>`).join('')}${shownArticles.length<law.articles.length?`<button type="button" class="load-more" data-law-more="${escapeHtml(law.law_name)}">再顯示 ${Math.min(50,law.articles.length-shownArticles.length)} 條</button>`:''}<p class="law-source">官方來源：<a href="${escapeHtml(law.source_url)}" target="_blank" rel="noreferrer">全國法規資料庫</a></p></div></details>`;
+    return `<details class="law-group" data-law-name="${escapeHtml(law.law_name)}" ${index===0?'open':''}><summary><div class="law-title"><b>${escapeHtml(law.law_name)}</b><span class="category-badge">${escapeHtml(law.category)}</span><span class="count-badge ${law.displayCount?'':'zero'}">${essayOnly?`申論命中 ${law.displayCount} 次`:law.question_count?`歷屆命中 ${law.question_count} 次`:'尚未出題'}</span></div><span class="law-source">${essayOnly?`申論涉及 ${law.articles.length} 條`:`共 ${law.article_count} 條`}｜展開閱讀</span></summary><div class="article-list">${shownArticles.map(article=>`<section class="article-item"><h4>第 ${escapeHtml(article.article_no)} 條 <span class="count-badge ${article.question_count?'':'zero'}">${essayOnly?`申論命中 ${article.essay_question_count} 題`:article.question_count?`命中 ${article.question_count} 題`:'未出題'}</span></h4><p class="official-text">${lawTermMarkup(article.content)}</p>${articleExplanationDetails(article)}</section>`).join('')}${shownArticles.length<law.articles.length?`<button type="button" class="load-more" data-law-more="${escapeHtml(law.law_name)}">再顯示 ${Math.min(50,law.articles.length-shownArticles.length)} 條</button>`:''}<p class="law-source">官方來源：<a href="${escapeHtml(law.source_url)}" target="_blank" rel="noreferrer">全國法規資料庫</a></p></div></details>`;
   }).join('');
 }
 
@@ -103,6 +109,77 @@ function renderGlossary(){
 }
 
 function escapeHtml(value){return String(value??'').replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]))}
+
+function buildLawTermLookup(){
+  lawTermLookup=new Map();
+  glossary.forEach(term=>{
+    const existing=lawTermLookup.get(term.term);
+    if(!existing||term.question_count>existing.question_count)lawTermLookup.set(term.term,term);
+  });
+  const words=[...lawTermLookup.keys()].filter(word=>word.length>=2).sort((a,b)=>b.length-a.length);
+  lawTermPattern=words.length?new RegExp(words.map(word=>word.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|'),'gu'):null;
+}
+
+function lawTermMarkup(value){
+  const text=String(value??'');
+  if(!lawTermPattern)return escapeHtml(text);
+  lawTermPattern.lastIndex=0;
+  let html='',last=0,match;
+  while((match=lawTermPattern.exec(text))!==null){
+    html+=escapeHtml(text.slice(last,match.index));
+    html+=`<button type="button" class="law-term" data-law-term="${escapeHtml(match[0])}" aria-expanded="false" aria-describedby="law-term-tooltip">${escapeHtml(match[0])}</button>`;
+    last=match.index+match[0].length;
+  }
+  return html+escapeHtml(text.slice(last));
+}
+
+function setupLawTermTooltip(){
+  if($('#law-term-tooltip'))return;
+  const tooltip=document.createElement('div');
+  tooltip.id='law-term-tooltip';tooltip.className='law-term-tooltip';tooltip.role='tooltip';tooltip.hidden=true;
+  tooltip.innerHTML='<strong></strong><p></p><small></small>';
+  document.body.appendChild(tooltip);
+  document.addEventListener('mouseover',event=>{const term=event.target.closest?.('.law-term');if(term&&!pinnedLawTerm)showLawTermTooltip(term)});
+  document.addEventListener('mouseout',event=>{const term=event.target.closest?.('.law-term');if(term&&!term.contains(event.relatedTarget)&&!pinnedLawTerm)hideLawTermTooltip()});
+  document.addEventListener('focusin',event=>{const term=event.target.closest?.('.law-term');if(term&&!pinnedLawTerm)showLawTermTooltip(term)});
+  document.addEventListener('focusout',event=>{const term=event.target.closest?.('.law-term');if(term&&!pinnedLawTerm)hideLawTermTooltip()});
+  document.addEventListener('click',event=>{
+    const term=event.target.closest?.('.law-term');
+    if(term){event.preventDefault();pinnedLawTerm===term?hideLawTermTooltip(true):showLawTermTooltip(term,true);return}
+    if(pinnedLawTerm)hideLawTermTooltip(true);
+  });
+  document.addEventListener('keydown',event=>{if(event.key==='Escape')hideLawTermTooltip(true)});
+  window.addEventListener('resize',()=>pinnedLawTerm?positionLawTermTooltip(pinnedLawTerm):hideLawTermTooltip());
+  window.addEventListener('scroll',()=>pinnedLawTerm?positionLawTermTooltip(pinnedLawTerm):hideLawTermTooltip(),true);
+}
+
+function showLawTermTooltip(element,pin=false){
+  const term=lawTermLookup.get(element.dataset.lawTerm);if(!term)return;
+  if(pinnedLawTerm&&pinnedLawTerm!==element)pinnedLawTerm.setAttribute('aria-expanded','false');
+  pinnedLawTerm=pin?element:null;
+  document.querySelectorAll('.law-term[aria-expanded="true"]').forEach(item=>item.setAttribute('aria-expanded','false'));
+  element.setAttribute('aria-expanded','true');
+  const tooltip=$('#law-term-tooltip');
+  tooltip.querySelector('strong').textContent=term.term;
+  tooltip.querySelector('p').textContent=term.plain_explanation;
+  tooltip.querySelector('small').textContent=`考題判斷：${term.exam_tip}`;
+  tooltip.hidden=false;positionLawTermTooltip(element);
+}
+
+function positionLawTermTooltip(element){
+  const tooltip=$('#law-term-tooltip');if(!tooltip||tooltip.hidden||!element?.isConnected)return;
+  const anchor=element.getBoundingClientRect(),box=tooltip.getBoundingClientRect(),gap=10,edge=12;
+  const left=Math.max(edge,Math.min(anchor.left,window.innerWidth-box.width-edge));
+  let top=anchor.top-box.height-gap;
+  if(top<edge)top=Math.min(window.innerHeight-box.height-edge,anchor.bottom+gap);
+  tooltip.style.left=`${left}px`;tooltip.style.top=`${Math.max(edge,top)}px`;
+}
+
+function hideLawTermTooltip(force=false){
+  if(pinnedLawTerm&&!force)return;
+  document.querySelectorAll('.law-term[aria-expanded="true"]').forEach(item=>item.setAttribute('aria-expanded','false'));
+  pinnedLawTerm=null;const tooltip=$('#law-term-tooltip');if(tooltip)tooltip.hidden=true;
+}
 
 async function loadBank(){
   const manifestResponse=await fetch('./data/index.json');
@@ -288,7 +365,7 @@ function returnToQuestion(){
 function completeLawReference(citation,sourceUrl){
   const result=citedOfficialArticles(citation);
   if(!result)return sourceUrl?`<p class="law-source-missing">這項依據尚未收錄在完整法條庫，請直接<a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noreferrer">到官方法規來源核對</a>。</p>`:'';
-  return `<details class="question-law-details"><summary>查看引用的完整法條與白話解釋 <span>展開閱讀</span></summary><div class="question-law-articles">${result.articles.map(article=>`<section><b>${escapeHtml(result.law.law_name)}第 ${escapeHtml(article.article_no)} 條</b><p class="official-text">${escapeHtml(article.content)}</p><details class="question-law-plain"><summary>白話解釋 <span>展開閱讀</span></summary><p>${escapeHtml(article.plain_explanation)}</p></details><button type="button" class="open-law-library" data-open-law="${escapeHtml(result.law.law_name)}" data-article-no="${escapeHtml(article.article_no)}">到「完整法條」閱讀</button></section>`).join('')}<a href="${escapeHtml(result.law.source_url)}" target="_blank" rel="noreferrer">到全國法規資料庫核對</a></div></details>`;
+  return `<details class="question-law-details"><summary>查看引用的完整法條與白話解釋 <span>展開閱讀</span></summary><div class="question-law-articles">${result.articles.map(article=>`<section><b>${escapeHtml(result.law.law_name)}第 ${escapeHtml(article.article_no)} 條</b><p class="official-text">${lawTermMarkup(article.content)}</p><details class="question-law-plain"><summary>白話解釋 <span>展開閱讀</span></summary><p>${escapeHtml(article.plain_explanation)}</p></details><button type="button" class="open-law-library" data-open-law="${escapeHtml(result.law.law_name)}" data-article-no="${escapeHtml(article.article_no)}">到「完整法條」閱讀</button></section>`).join('')}<a href="${escapeHtml(result.law.source_url)}" target="_blank" rel="noreferrer">到全國法規資料庫核對</a></div></details>`;
 }
 
 function laws(e){
