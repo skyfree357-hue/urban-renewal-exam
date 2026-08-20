@@ -1,7 +1,11 @@
 let bank=[];
 let lawLibrary=[];
 let glossary=[];
-const lawArticleLimits=new Map();
+const LAW_BOOKMARK_STORAGE_KEY='realEstateLawBookmarksV1';
+const lawArticleWindows=new Map();
+let lawBookmarks=loadLawBookmarks();
+let lawBookmarkObserver=null;
+let lawResumeTarget=null;
 let lawJumpTarget=null;
 let lawReturnState=null;
 let lawTermLookup=new Map();
@@ -55,9 +59,12 @@ function setupLibraries(){
   $('#term-category').onchange=renderGlossary;
   $('#term-search').oninput=renderGlossary;
   $('#law-list').onclick=event=>{
+    const resumeButton=event.target.closest('[data-law-resume]');
+    if(resumeButton){event.preventDefault();event.stopPropagation();resumeLawBookmark(resumeButton.dataset.lawResume);return}
     const button=event.target.closest('[data-law-more]');if(!button)return;
-    const name=button.dataset.lawMore;lawArticleLimits.set(name,(lawArticleLimits.get(name)||30)+50);renderLawLibrary();
-    requestAnimationFrame(()=>document.querySelector(`[data-law-name="${CSS.escape(name)}"]`)?.setAttribute('open',''));
+    const name=button.dataset.lawMore,current=lawArticleWindows.get(name)||{articleNo:null,count:30};
+    lawArticleWindows.set(name,{...current,count:current.count+50});renderLawLibrary();
+    requestAnimationFrame(()=>document.querySelector(`.law-group[data-law-name="${CSS.escape(name)}"]`)?.setAttribute('open',''));
   };
   refreshTermCategories();
   renderLawLibrary();renderGlossary();
@@ -87,9 +94,48 @@ function renderLawLibrary(){
   $('#law-summary').textContent=essayOnly?`${filtered.length} 部法規｜${articleTotal} 條｜申論題命中 ${hitTotal} 次`:`${filtered.length} 部法規｜${articleTotal.toLocaleString()} 條｜${hitTotal} 次考題命中`;
   if(!filtered.length){$('#law-list').innerHTML='<div class="empty-library">找不到符合條件的法條</div>';return}
   $('#law-list').innerHTML=filtered.map((law,index)=>{
-    const limit=query?law.articles.length:(lawArticleLimits.get(law.law_name)||30),shownArticles=law.articles.slice(0,limit);
-    return `<details class="law-group" data-law-name="${escapeHtml(law.law_name)}" ${index===0?'open':''}><summary><div class="law-title"><b>${escapeHtml(law.law_name)}</b><span class="category-badge">${escapeHtml(law.category)}</span><span class="count-badge ${law.displayCount?'':'zero'}">${essayOnly?`申論命中 ${law.displayCount} 次`:law.question_count?`歷屆命中 ${law.question_count} 次`:'尚未出題'}</span></div><span class="law-source">${essayOnly?`申論涉及 ${law.articles.length} 條`:`共 ${law.article_count} 條`}｜展開閱讀</span></summary><div class="article-list">${shownArticles.map(article=>`<section class="article-item"><h4>第 ${escapeHtml(article.article_no)} 條 <span class="count-badge ${article.question_count?'':'zero'}">${essayOnly?`申論命中 ${article.essay_question_count} 題`:article.question_count?`命中 ${article.question_count} 題`:'未出題'}</span></h4><p class="official-text">${lawTermMarkup(article.content)}</p>${articleExplanationDetails(article)}</section>`).join('')}${shownArticles.length<law.articles.length?`<button type="button" class="load-more" data-law-more="${escapeHtml(law.law_name)}">再顯示 ${Math.min(50,law.articles.length-shownArticles.length)} 條</button>`:''}<p class="law-source">官方來源：<a href="${escapeHtml(law.source_url)}" target="_blank" rel="noreferrer">全國法規資料庫</a></p></div></details>`;
+    const windowState=lawArticleWindows.get(law.law_name)||{articleNo:null,count:30};
+    const foundIndex=windowState.articleNo?law.articles.findIndex(article=>String(article.article_no)===String(windowState.articleNo)):-1;
+    const startIndex=foundIndex>=0?foundIndex:0,limit=query?law.articles.length:windowState.count;
+    const shownArticles=law.articles.slice(startIndex,startIndex+limit),remaining=Math.max(0,law.articles.length-startIndex-shownArticles.length);
+    const bookmark=lawBookmarks[law.law_name],resumeLabel=bookmark?`🔖 接續第 ${bookmark.articleNo} 條`:'🔖 開始閱讀';
+    const shouldOpen=index===0||lawResumeTarget===law.law_name;
+    return `<details class="law-group" data-law-name="${escapeHtml(law.law_name)}" ${shouldOpen?'open':''}><summary><div class="law-title"><b>${escapeHtml(law.law_name)}</b><span class="category-badge">${escapeHtml(law.category)}</span><span class="count-badge ${law.displayCount?'':'zero'}">${essayOnly?`申論命中 ${law.displayCount} 次`:law.question_count?`歷屆命中 ${law.question_count} 次`:'尚未出題'}</span></div><div class="law-summary-actions"><span class="law-source">${essayOnly?`申論涉及 ${law.articles.length} 條`:`共 ${law.article_count} 條`}｜展開閱讀</span><button type="button" class="law-bookmark" data-law-resume="${escapeHtml(law.law_name)}" aria-label="${escapeHtml(law.law_name)}${escapeHtml(resumeLabel)}">${escapeHtml(resumeLabel)}</button></div></summary><div class="article-list">${shownArticles.map(article=>`<section class="article-item" data-bookmark-law="${escapeHtml(law.law_name)}" data-bookmark-article="${escapeHtml(article.article_no)}"><h4>第 ${escapeHtml(article.article_no)} 條 <span class="count-badge ${article.question_count?'':'zero'}">${essayOnly?`申論命中 ${article.essay_question_count} 題`:article.question_count?`命中 ${article.question_count} 題`:'未出題'}</span></h4><p class="official-text">${lawTermMarkup(article.content)}</p>${articleExplanationDetails(article)}</section>`).join('')}${remaining?`<button type="button" class="load-more" data-law-more="${escapeHtml(law.law_name)}">再顯示 ${Math.min(50,remaining)} 條</button>`:''}<p class="law-source">官方來源：<a href="${escapeHtml(law.source_url)}" target="_blank" rel="noreferrer">全國法規資料庫</a></p></div></details>`;
   }).join('');
+  observeLawReadingPositions();
+}
+
+function loadLawBookmarks(){
+  try{return JSON.parse(localStorage.getItem(LAW_BOOKMARK_STORAGE_KEY)||'{}')||{}}catch{return {}}
+}
+
+function saveLawBookmark(lawName,articleNo){
+  if(!lawName||!articleNo||lawBookmarks[lawName]?.articleNo===articleNo)return;
+  lawBookmarks[lawName]={articleNo,updatedAt:new Date().toISOString()};
+  try{localStorage.setItem(LAW_BOOKMARK_STORAGE_KEY,JSON.stringify(lawBookmarks))}catch{}
+  const button=document.querySelector(`[data-law-resume="${CSS.escape(lawName)}"]`);
+  if(button){button.textContent=`🔖 接續第 ${articleNo} 條`;button.setAttribute('aria-label',`${lawName}接續第 ${articleNo} 條`)}
+}
+
+function observeLawReadingPositions(){
+  lawBookmarkObserver?.disconnect();
+  if(!('IntersectionObserver' in window))return;
+  lawBookmarkObserver=new IntersectionObserver(entries=>{
+    const visible=entries.filter(entry=>entry.isIntersecting&&entry.target.closest('.law-group[open]'))
+      .sort((a,b)=>Math.abs(a.boundingClientRect.top-window.innerHeight*.2)-Math.abs(b.boundingClientRect.top-window.innerHeight*.2));
+    const target=visible[0]?.target;if(target)saveLawBookmark(target.dataset.bookmarkLaw,target.dataset.bookmarkArticle);
+  },{rootMargin:'-15% 0px -60% 0px',threshold:0});
+  document.querySelectorAll('[data-bookmark-law][data-bookmark-article]').forEach(article=>lawBookmarkObserver.observe(article));
+}
+
+function resumeLawBookmark(lawName){
+  const articleNo=lawBookmarks[lawName]?.articleNo||null;
+  lawArticleWindows.set(lawName,{articleNo,count:51});lawResumeTarget=lawName;renderLawLibrary();lawResumeTarget=null;
+  requestAnimationFrame(()=>{
+    const group=document.querySelector(`.law-group[data-law-name="${CSS.escape(lawName)}"]`);group?.setAttribute('open','');
+    const target=articleNo?group?.querySelector(`[data-bookmark-article="${CSS.escape(String(articleNo))}"]`):group?.querySelector('[data-bookmark-article]');
+    (target||group)?.scrollIntoView({behavior:'smooth',block:'start'});
+  });
 }
 
 function articleExplanationDetails(article){
