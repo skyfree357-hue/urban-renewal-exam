@@ -4,12 +4,12 @@ import {addDoc,collection,deleteDoc,doc,getDoc,getDocs,serverTimestamp,setDoc} f
 import {getFirestore} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 const firebaseConfig={
-  apiKey:'AIzaSyD2Vt6AXNTPYmo5E5j8qPhjup0X-715W14',
-  authDomain:'urban-renewal-exam.firebaseapp.com',
-  projectId:'urban-renewal-exam',
-  storageBucket:'urban-renewal-exam.firebasestorage.app',
-  messagingSenderId:'55532864428',
-  appId:'1:55532864428:web:7657b70db313e9cf0bb009'
+  apiKey:'AIzaSyDG37p4JYM-SUZ2brI-_Piy9O9SzFkLlN0',
+  authDomain:'real-estate-broker-exam-357.firebaseapp.com',
+  projectId:'real-estate-broker-exam-357',
+  storageBucket:'real-estate-broker-exam-357.firebasestorage.app',
+  messagingSenderId:'131205779305',
+  appId:'1:131205779305:web:177f38972415e596f837f8'
 };
 
 const app=initializeApp(firebaseConfig,'real-estate-broker-exam');
