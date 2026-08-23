@@ -1,10 +1,11 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>地產國考練習室</title><link rel="stylesheet" href="./styles.css?v=20260823-4"></head><body>
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>地產國考練習室</title><link rel="stylesheet" href="./styles.css?v=20260823-5"></head><body>
 <header class="hero">
   <div class="hero-copy"><small>不動產經紀人｜AI 學習系統</small><h1>把每一次答錯，變成下一次拿分。</h1><aside id="account-panel" class="account-panel" aria-live="polite"><div><b id="account-title">登入後自動保存</b><p id="account-message">使用 Google 帳號登入，可自動同步考試紀錄、錯題、作答進度與法條書籤。</p></div><button type="button" id="google-login">使用 Google 帳號登入</button><button type="button" id="google-logout" class="account-logout" hidden>登出</button></aside></div>
   <div class="hero-entry" role="navigation" aria-label="學習功能">
     <button type="button" class="entry-card active" data-view="exam"><span>01</span><b>考古題考試</b><small>考試與即時複習模式</small></button>
     <button type="button" class="entry-card" data-view="laws"><span>02</span><b>完整法條</b><small>官方全文與應試拆解</small></button>
     <button type="button" class="entry-card" data-view="terms"><span>03</span><b>專有名詞</b><small>高頻觀念白話整理</small></button>
+    <button type="button" class="entry-card" data-view="history"><span>04</span><b>法規歷史</b><small>土地制度的形成脈絡</small></button>
   </div>
 </header>
 <main>
@@ -24,5 +25,12 @@
     <div class="library-controls"><label>科目<select id="term-subject"></select></label><label>類型<select id="term-category"></select></label><label class="search-field">搜尋<input id="term-search" type="search" placeholder="輸入名詞或關鍵字"></label></div>
     <div id="term-list" class="term-grid"></div>
   </section>
+  <section id="history-view" class="study-view" hidden>
+    <button type="button" id="back-from-history" class="back-to-question" hidden>← 回到專題列表</button>
+    <div class="library-head"><div><p class="eyebrow">少而重要的制度歷史</p><h2>法規歷史專題</h2><p>從制度與事件理解法律為什麼形成；未經可靠來源核對的年代不會顯示為事實。</p></div><div id="history-summary" class="library-summary"></div></div>
+    <div id="history-controls" class="library-controls history-controls"><label>法規<select id="history-law"></select></label><label>制度類型<select id="history-category"></select></label><label class="search-field">搜尋<input id="history-search" type="search" placeholder="海岸、三七五減租、總登記…"></label></div>
+    <div id="history-list" class="history-grid"></div>
+    <article id="history-topic" class="history-topic" hidden></article>
+  </section>
 </main>
-<script src="./app.js?v=20260823-6"></script><script type="module" src="./cloud-sync.js?v=20260823-3"></script></body></html>
+<script src="./app.js?v=20260823-7"></script><script type="module" src="./cloud-sync.js?v=20260823-3"></script></body></html>
