@@ -33,8 +33,13 @@ function setAccountUi(status,message){
 function mergeBookmarks(remote,local){
   const merged={...remote};
   Object.entries(local).forEach(([law,item])=>{
-    const remoteTime=Date.parse(merged[law]?.updatedAt||0),localTime=Date.parse(item?.updatedAt||0);
-    if(!merged[law]||localTime>=remoteTime)merged[law]=item;
+    const remoteItem=merged[law]||{},remoteTime=Date.parse(remoteItem.updatedAt||0),localTime=Date.parse(item?.updatedAt||0);
+    const latest=localTime>=remoteTime?item:remoteItem,reviewArticles={...(remoteItem.reviewArticles||{})};
+    Object.entries(item?.reviewArticles||{}).forEach(([articleNo,record])=>{
+      const remoteRecord=reviewArticles[articleNo],remoteRecordTime=Date.parse(remoteRecord?.updatedAt||0),localRecordTime=Date.parse(record?.updatedAt||0);
+      if(!remoteRecord||localRecordTime>=remoteRecordTime)reviewArticles[articleNo]=record;
+    });
+    merged[law]={...latest,reviewArticles};
   });
   return merged;
 }

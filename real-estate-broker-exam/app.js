@@ -17,7 +17,7 @@ const $=selector=>document.querySelector(selector);
 
 window.addEventListener('study-cloud-ready',event=>{
   cloudHistory=event.detail.history||[];
-  lawBookmarks=event.detail.bookmarks||{};
+  lawBookmarks=normalizeLawBookmarks(event.detail.bookmarks||{});
   renderLawLibrary();loadDashboard();
   restoreCloudDraft(event.detail.draft);
 });
@@ -58,7 +58,7 @@ function showStudyView(view){
 function setupLibraries(){
   const lawSubjects=[...new Set(lawLibrary.flatMap(law=>law.subjects||[]))];
   $('#law-subject').innerHTML='<option value="">全部科目</option>'+lawSubjects.map(x=>`<option>${escapeHtml(x)}</option>`).join('');
-  $('#law-category').innerHTML='<option value="">全部類型</option><option value="__ranked__">命中題數排序</option><option value="__essay__">申論題出現過</option>'+[...new Set(lawLibrary.map(x=>x.category))].map(x=>`<option>${escapeHtml(x)}</option>`).join('');
+  $('#law-category').innerHTML='<option value="">全部類型</option><option value="__ranked__">命中題數排序</option><option value="__bookmarks__">我的書籤</option><option value="__essay__">申論題出現過</option>'+[...new Set(lawLibrary.map(x=>x.category))].map(x=>`<option>${escapeHtml(x)}</option>`).join('');
   $('#term-subject').innerHTML='<option value="">全部科目</option>'+[...new Set(glossary.map(x=>x.subject))].map(x=>`<option>${escapeHtml(x)}</option>`).join('');
   $('#term-category').innerHTML='<option value="">全部類型</option>';
   ['law-subject','law-category'].forEach(id=>$('#'+id).addEventListener('change',()=>{lawJumpTarget=null;lawArticleWindows.clear();renderLawLibrary()}));
@@ -69,10 +69,16 @@ function setupLibraries(){
   $('#term-category').onchange=renderGlossary;
   $('#term-search').oninput=renderGlossary;
   $('#law-list').onclick=event=>{
-    const bookmarkCheckbox=event.target.closest('[data-law-bookmark-check]');
-    if(bookmarkCheckbox){
+    const reviewBookmark=event.target.closest('[data-law-review-bookmark]');
+    if(reviewBookmark){
       event.stopPropagation();
-      setLawBookmarkSelection(bookmarkCheckbox.dataset.bookmarkLaw,bookmarkCheckbox.dataset.bookmarkArticle,bookmarkCheckbox.checked);
+      setReviewBookmarkSelection(reviewBookmark.dataset.bookmarkLaw,reviewBookmark.dataset.bookmarkArticle,reviewBookmark.checked);
+      return;
+    }
+    const lastRead=event.target.closest('[data-law-last-read]');
+    if(lastRead){
+      event.stopPropagation();
+      setLastReadSelection(lastRead.dataset.bookmarkLaw,lastRead.dataset.bookmarkArticle,lastRead.checked);
       return;
     }
     const resumeButton=event.target.closest('[data-law-resume]');
@@ -93,59 +99,101 @@ function refreshTermCategories(){
   $('#term-category').value=previous==='__essay__'||categories.includes(previous)?previous:'';
 }
 
+function lawOrderMode(category=$('#law-category').value){
+  if(category==='__ranked__')return 'hits';
+  if(category==='__essay__')return 'essay';
+  if(category==='__bookmarks__')return 'bookmarks';
+  return 'article';
+}
+
+function isReviewBookmarked(lawName,articleNo){
+  const saved=lawBookmarks[lawName]?.reviewArticles?.[String(articleNo)];
+  return saved===true||saved?.saved===true;
+}
+
 function renderLawLibrary(){
   hideLawTermTooltip(true);
   const subject=$('#law-subject').value,category=$('#law-category').value,query=$('#law-search').value.trim().toLowerCase();
-  const essayOnly=category==='__essay__',rankByHits=category==='__ranked__';
+  const essayOnly=category==='__essay__',rankByHits=category==='__ranked__',bookmarkedOnly=category==='__bookmarks__';
   const filtered=lawLibrary.map(law=>{
     if(lawJumpTarget&&law.law_name!==lawJumpTarget.lawName)return null;
     if(subject&&!(law.subjects||[]).includes(subject))return null;
-    if(category&&!essayOnly&&!rankByHits&&law.category!==category)return null;
+    if(category&&!essayOnly&&!rankByHits&&!bookmarkedOnly&&law.category!==category)return null;
     const nameMatch=!query||`${law.law_name} ${law.category}`.toLowerCase().includes(query);
-    const articles=sortLawArticles((law.articles||[]).filter(a=>(!lawJumpTarget||String(a.article_no)===lawJumpTarget.articleNo)&&(!essayOnly||a.essay_question_count>0)&&(nameMatch||`${a.article_no} ${a.content} ${a.plain_explanation}`.toLowerCase().includes(query))),essayOnly?'essay':rankByHits?'hits':'article');
-    const displayCount=essayOnly?articles.reduce((n,a)=>n+a.essay_question_count,0):law.question_count;
+    const articles=sortLawArticles((law.articles||[]).filter(a=>(!lawJumpTarget||String(a.article_no)===lawJumpTarget.articleNo)&&(!essayOnly||a.essay_question_count>0)&&(!bookmarkedOnly||isReviewBookmarked(law.law_name,a.article_no))&&(nameMatch||`${a.article_no} ${a.content} ${a.plain_explanation}`.toLowerCase().includes(query))),lawOrderMode(category));
+    const displayCount=essayOnly?articles.reduce((n,a)=>n+a.essay_question_count,0):bookmarkedOnly?articles.length:law.question_count;
     return articles.length?{...law,articles,displayCount}:null;
   }).filter(Boolean).sort((a,b)=>(rankByHits||essayOnly?b.displayCount-a.displayCount:0)||a.law_name.localeCompare(b.law_name,'zh-Hant'));
   const articleTotal=filtered.reduce((n,x)=>n+x.articles.length,0),hitTotal=filtered.reduce((n,x)=>n+x.displayCount,0);
-  $('#law-order-label').textContent=essayOnly?'申論題出現過':rankByHits?'依 104～114 年命中題數排序':'依法規條號順序閱讀';
-  $('#law-order-description').textContent=essayOnly?'只顯示歷屆申論題引用過的法條，依申論命中次數排列。':rankByHits?'考過的法規及條文依命中題數置前，未出題條文仍完整保留。':'預設由第一條往後排列；需要時可從類型選單切換命中題數或申論題排序。';
-  $('#law-summary').textContent=essayOnly?`${filtered.length} 部法規｜${articleTotal} 條｜申論題命中 ${hitTotal} 次`:`${filtered.length} 部法規｜${articleTotal.toLocaleString()} 條｜${hitTotal} 次考題命中`;
+  $('#law-order-label').textContent=essayOnly?'申論題出現過':bookmarkedOnly?'我的反覆複習書籤':rankByHits?'依 104～114 年命中題數排序':'依法規條號順序閱讀';
+  $('#law-order-description').textContent=essayOnly?'只顯示歷屆申論題引用過的法條，依申論命中次數排列。':bookmarkedOnly?'只顯示您勾選為書籤的法條，方便反覆閱讀與複習。':rankByHits?'考過的法規及條文依命中題數置前，未出題條文仍完整保留。':'預設由第一條往後排列；需要時可從類型選單切換命中題數、書籤或申論題排序。';
+  $('#law-summary').textContent=essayOnly?`${filtered.length} 部法規｜${articleTotal} 條｜申論題命中 ${hitTotal} 次`:bookmarkedOnly?`${filtered.length} 部法規｜已收藏 ${articleTotal} 條`:`${filtered.length} 部法規｜${articleTotal.toLocaleString()} 條｜${hitTotal} 次考題命中`;
   if(!filtered.length){$('#law-list').innerHTML='<div class="empty-library">找不到符合條件的法條</div>';return}
   $('#law-list').innerHTML=filtered.map((law,index)=>{
     const windowState=lawArticleWindows.get(law.law_name)||{articleNo:null,count:30};
     const foundIndex=windowState.articleNo?law.articles.findIndex(article=>String(article.article_no)===String(windowState.articleNo)):-1;
     const startIndex=foundIndex>=0?foundIndex:0,limit=query?law.articles.length:windowState.count;
     const shownArticles=law.articles.slice(startIndex,startIndex+limit),remaining=Math.max(0,law.articles.length-startIndex-shownArticles.length);
-    const bookmark=lawBookmarks[law.law_name],resumeLabel=bookmark?`🔖 接續第 ${bookmark.articleNo} 條`:'🔖 尚未設定';
+    const bookmark=lawBookmarks[law.law_name],resumeLabel=bookmark?.articleNo?`▶ 接續第 ${bookmark.articleNo} 條`:'▶ 尚未設定最後閱讀';
     const shouldOpen=index===0||lawResumeTarget===law.law_name;
-    return `<details class="law-group" data-law-name="${escapeHtml(law.law_name)}" ${shouldOpen?'open':''}><summary><div class="law-title"><b>${escapeHtml(law.law_name)}</b><span class="category-badge">${escapeHtml(law.category)}</span><span class="count-badge ${law.displayCount?'':'zero'}">${essayOnly?`申論命中 ${law.displayCount} 次`:law.question_count?`歷屆命中 ${law.question_count} 次`:'尚未出題'}</span></div><div class="law-summary-actions"><span class="law-source">${essayOnly?`申論涉及 ${law.articles.length} 條`:`共 ${law.article_count} 條`}｜展開閱讀</span><button type="button" class="law-bookmark" data-law-resume="${escapeHtml(law.law_name)}" aria-label="${escapeHtml(law.law_name)}${escapeHtml(resumeLabel)}" ${bookmark?'':'disabled'}>${escapeHtml(resumeLabel)}</button></div></summary><div class="article-list">${shownArticles.map(article=>renderLawArticle(article,law,essayOnly,bookmark)).join('')}${remaining?`<button type="button" class="load-more" data-law-more="${escapeHtml(law.law_name)}">再顯示 ${Math.min(50,remaining)} 條</button>`:''}<p class="law-source">官方來源：<a href="${escapeHtml(law.source_url)}" target="_blank" rel="noreferrer">全國法規資料庫</a></p></div></details>`;
+    return `<details class="law-group" data-law-name="${escapeHtml(law.law_name)}" ${shouldOpen?'open':''}><summary><div class="law-title"><b>${escapeHtml(law.law_name)}</b><span class="category-badge">${escapeHtml(law.category)}</span><span class="count-badge ${law.displayCount?'':'zero'}">${essayOnly?`申論命中 ${law.displayCount} 次`:bookmarkedOnly?`收藏 ${law.articles.length} 條`:law.question_count?`歷屆命中 ${law.question_count} 次`:'尚未出題'}</span></div><div class="law-summary-actions"><span class="law-source">${essayOnly?`申論涉及 ${law.articles.length} 條`:`共 ${law.article_count} 條`}｜展開閱讀</span><button type="button" class="law-bookmark" data-law-resume="${escapeHtml(law.law_name)}" aria-label="${escapeHtml(law.law_name)}${escapeHtml(resumeLabel)}" ${bookmark?.articleNo?'':'disabled'}>${escapeHtml(resumeLabel)}</button></div></summary><div class="article-list">${shownArticles.map(article=>renderLawArticle(article,law,essayOnly,bookmark)).join('')}${remaining?`<button type="button" class="load-more" data-law-more="${escapeHtml(law.law_name)}">再顯示 ${Math.min(50,remaining)} 條</button>`:''}<p class="law-source">官方來源：<a href="${escapeHtml(law.source_url)}" target="_blank" rel="noreferrer">全國法規資料庫</a></p></div></details>`;
   }).join('');
 }
 
 function renderLawArticle(article,law,essayOnly,bookmark){
-  const isBookmarked=String(bookmark?.articleNo||'')===String(article.article_no);
-  return `<section class="article-item" data-bookmark-law="${escapeHtml(law.law_name)}" data-bookmark-article="${escapeHtml(article.article_no)}"><div class="article-heading"><h4>第 ${escapeHtml(article.article_no)} 條 <span class="count-badge ${article.question_count?'':'zero'}">${essayOnly?`申論命中 ${article.essay_question_count} 題`:article.question_count?`命中 ${article.question_count} 題`:'未出題'}</span></h4><label class="article-bookmark-check"><input type="checkbox" data-law-bookmark-check data-bookmark-law="${escapeHtml(law.law_name)}" data-bookmark-article="${escapeHtml(article.article_no)}" ${isBookmarked?'checked':''}> 設為書籤</label></div><p class="official-text">${lawTermMarkup(article.content)}</p>${articleExplanationDetails(article)}</section>`;
+  const isLastRead=String(bookmark?.articleNo||'')===String(article.article_no),isSaved=isReviewBookmarked(law.law_name,article.article_no);
+  const reviewControl=`<label class="article-bookmark-check review-bookmark"><input type="checkbox" data-law-review-bookmark data-bookmark-law="${escapeHtml(law.law_name)}" data-bookmark-article="${escapeHtml(article.article_no)}" ${isSaved?'checked':''}> 書籤</label>`;
+  const lastReadControl=`<label class="article-bookmark-check last-read"><input type="checkbox" data-law-last-read data-law-bookmark-check data-bookmark-law="${escapeHtml(law.law_name)}" data-bookmark-article="${escapeHtml(article.article_no)}" ${isLastRead?'checked':''}> 最後閱讀</label>`;
+  return `<section class="article-item" data-bookmark-law="${escapeHtml(law.law_name)}" data-bookmark-article="${escapeHtml(article.article_no)}"><div class="article-heading"><h4>第 ${escapeHtml(article.article_no)} 條 <span class="count-badge ${article.question_count?'':'zero'}">${essayOnly?`申論命中 ${article.essay_question_count} 題`:article.question_count?`命中 ${article.question_count} 題`:'未出題'}</span></h4><div class="article-reading-controls">${reviewControl}${lastReadControl}</div></div><p class="official-text">${lawTermMarkup(article.content)}</p>${articleExplanationDetails(article)}</section>`;
 }
 
 function loadLawBookmarks(){
-  try{return JSON.parse(localStorage.getItem(LAW_BOOKMARK_STORAGE_KEY)||'{}')||{}}catch{return {}}
+  try{return normalizeLawBookmarks(JSON.parse(localStorage.getItem(LAW_BOOKMARK_STORAGE_KEY)||'{}')||{})}catch{return {}}
 }
 
-function setLawBookmarkSelection(lawName,articleNo,checked){
-  if(!lawName||!articleNo)return;
-  if(checked)lawBookmarks[lawName]={articleNo,updatedAt:new Date().toISOString()};
-  else if(String(lawBookmarks[lawName]?.articleNo||'')===String(articleNo))delete lawBookmarks[lawName];
+function normalizeLawBookmarks(items){
+  const normalized={};
+  Object.entries(items||{}).forEach(([lawName,value])=>{
+    const entry=value&&typeof value==='object'?value:{},reviewArticles={...(entry.reviewArticles||{})};
+    // 舊版只有一個「書籤」欄位；升級後同時保留為複習書籤與最後閱讀位置。
+    if(entry.articleNo&&!Object.keys(reviewArticles).length){
+      reviewArticles[String(entry.articleNo)]={saved:true,updatedAt:entry.updatedAt||new Date(0).toISOString()};
+    }
+    normalized[lawName]={...entry,reviewArticles};
+  });
+  return normalized;
+}
+
+function persistLawBookmarks(){
   if(window.studyCloud?.isSignedIn())window.studyCloud.saveBookmarks(lawBookmarks);
   else try{localStorage.setItem(LAW_BOOKMARK_STORAGE_KEY,JSON.stringify(lawBookmarks))}catch{}
+}
+
+function setReviewBookmarkSelection(lawName,articleNo,checked){
+  if(!lawName||!articleNo)return;
+  const entry=lawBookmarks[lawName]||{},reviewArticles={...(entry.reviewArticles||{})};
+  reviewArticles[String(articleNo)]={saved:checked,updatedAt:new Date().toISOString()};
+  lawBookmarks[lawName]={...entry,reviewArticles,updatedAt:new Date().toISOString()};
+  persistLawBookmarks();
+  if($('#law-category').value==='__bookmarks__')renderLawLibrary();
+}
+
+function setLastReadSelection(lawName,articleNo,checked){
+  if(!lawName||!articleNo)return;
+  const entry=lawBookmarks[lawName]||{},isCurrent=String(entry.articleNo||'')===String(articleNo),now=new Date().toISOString();
+  lawBookmarks[lawName]={...entry,articleNo:checked?String(articleNo):(isCurrent?null:entry.articleNo),orderMode:checked?lawOrderMode():(isCurrent?'article':entry.orderMode),updatedAt:now};
+  persistLawBookmarks();
   const button=document.querySelector(`[data-law-resume="${CSS.escape(lawName)}"]`);
   const saved=lawBookmarks[lawName]?.articleNo;
-  if(button){button.textContent=saved?`🔖 接續第 ${saved} 條`:'🔖 尚未設定';button.disabled=!saved;button.setAttribute('aria-label',saved?`${lawName}接續第 ${saved} 條`:`${lawName}尚未設定書籤`)}
+  if(button){button.textContent=saved?`▶ 接續第 ${saved} 條`:'▶ 尚未設定最後閱讀';button.disabled=!saved;button.setAttribute('aria-label',saved?`${lawName}接續第 ${saved} 條`:`${lawName}尚未設定最後閱讀`)}
   document.querySelectorAll(`[data-law-bookmark-check][data-bookmark-law="${CSS.escape(lawName)}"]`).forEach(input=>{input.checked=String(input.dataset.bookmarkArticle)===String(saved||'')});
 }
 
 function resumeLawBookmark(lawName){
-  const articleNo=lawBookmarks[lawName]?.articleNo||null;
+  const saved=lawBookmarks[lawName]||{},articleNo=saved.articleNo||null;
   if(!articleNo)return;
+  const category=saved.orderMode==='hits'?'__ranked__':saved.orderMode==='essay'?'__essay__':saved.orderMode==='bookmarks'&&isReviewBookmarked(lawName,articleNo)?'__bookmarks__':'';
+  $('#law-subject').value='';$('#law-category').value=category;$('#law-search').value='';lawJumpTarget=null;
   lawArticleWindows.set(lawName,{articleNo,count:51});lawResumeTarget=lawName;renderLawLibrary();lawResumeTarget=null;
   requestAnimationFrame(()=>{
     const group=document.querySelector(`.law-group[data-law-name="${CSS.escape(lawName)}"]`);group?.setAttribute('open','');
