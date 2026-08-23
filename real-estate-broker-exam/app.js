@@ -26,7 +26,7 @@ window.addEventListener('study-cloud-signed-out',()=>{
 });
 
 async function init(){
-  [bank,lawLibrary,glossary]=await Promise.all([loadBank(),loadJson('./data/law_library.json?v=20260823-4','laws'),loadJson('./data/glossary.json?v=20260820-2','terms')]);
+  [bank,lawLibrary,glossary]=await Promise.all([loadBank(),loadJson('./data/law_library.json?v=20260823-5','laws'),loadJson('./data/glossary.json?v=20260823-3','terms')]);
   buildLawTermLookup();
   setupLawTermTooltip();
   const years=[...new Set(bank.map(q=>q.exam_year))].sort((a,b)=>b-a);
