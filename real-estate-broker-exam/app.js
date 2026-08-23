@@ -26,7 +26,7 @@ window.addEventListener('study-cloud-signed-out',()=>{
 });
 
 async function init(){
-  [bank,lawLibrary,glossary]=await Promise.all([loadBank(),loadJson('./data/law_library.json?v=20260823-5','laws'),loadJson('./data/glossary.json?v=20260823-3','terms')]);
+  [bank,lawLibrary,glossary]=await Promise.all([loadBank(),loadJson('./data/law_library.json?v=20260823-7','laws'),loadJson('./data/glossary.json?v=20260823-3','terms')]);
   buildLawTermLookup();
   setupLawTermTooltip();
   const years=[...new Set(bank.map(q=>q.exam_year))].sort((a,b)=>b-a);
@@ -58,10 +58,10 @@ function showStudyView(view){
 function setupLibraries(){
   const lawSubjects=[...new Set(lawLibrary.flatMap(law=>law.subjects||[]))];
   $('#law-subject').innerHTML='<option value="">全部科目</option>'+lawSubjects.map(x=>`<option>${escapeHtml(x)}</option>`).join('');
-  $('#law-category').innerHTML='<option value="">全部類型</option><option value="__essay__">申論題出現過</option>'+[...new Set(lawLibrary.map(x=>x.category))].map(x=>`<option>${escapeHtml(x)}</option>`).join('');
+  $('#law-category').innerHTML='<option value="">全部類型</option><option value="__ranked__">命中題數排序</option><option value="__essay__">申論題出現過</option>'+[...new Set(lawLibrary.map(x=>x.category))].map(x=>`<option>${escapeHtml(x)}</option>`).join('');
   $('#term-subject').innerHTML='<option value="">全部科目</option>'+[...new Set(glossary.map(x=>x.subject))].map(x=>`<option>${escapeHtml(x)}</option>`).join('');
   $('#term-category').innerHTML='<option value="">全部類型</option>';
-  ['law-subject','law-category'].forEach(id=>$('#'+id).addEventListener('change',()=>{lawJumpTarget=null;renderLawLibrary()}));
+  ['law-subject','law-category'].forEach(id=>$('#'+id).addEventListener('change',()=>{lawJumpTarget=null;lawArticleWindows.clear();renderLawLibrary()}));
   $('#law-search').addEventListener('input',()=>{lawJumpTarget=null;renderLawLibrary()});
   $('#back-to-question').onclick=returnToQuestion;
   $('#exam-view').addEventListener('click',event=>{const button=event.target.closest('[data-open-law]');if(button)openLawLibraryFromQuestion(button)});
@@ -96,17 +96,19 @@ function refreshTermCategories(){
 function renderLawLibrary(){
   hideLawTermTooltip(true);
   const subject=$('#law-subject').value,category=$('#law-category').value,query=$('#law-search').value.trim().toLowerCase();
-  const essayOnly=category==='__essay__';
+  const essayOnly=category==='__essay__',rankByHits=category==='__ranked__';
   const filtered=lawLibrary.map(law=>{
     if(lawJumpTarget&&law.law_name!==lawJumpTarget.lawName)return null;
     if(subject&&!(law.subjects||[]).includes(subject))return null;
-    if(category&&!essayOnly&&law.category!==category)return null;
+    if(category&&!essayOnly&&!rankByHits&&law.category!==category)return null;
     const nameMatch=!query||`${law.law_name} ${law.category}`.toLowerCase().includes(query);
-    const articles=sortLawArticles((law.articles||[]).filter(a=>(!lawJumpTarget||String(a.article_no)===lawJumpTarget.articleNo)&&(!essayOnly||a.essay_question_count>0)&&(nameMatch||`${a.article_no} ${a.content} ${a.plain_explanation}`.toLowerCase().includes(query))),essayOnly);
+    const articles=sortLawArticles((law.articles||[]).filter(a=>(!lawJumpTarget||String(a.article_no)===lawJumpTarget.articleNo)&&(!essayOnly||a.essay_question_count>0)&&(nameMatch||`${a.article_no} ${a.content} ${a.plain_explanation}`.toLowerCase().includes(query))),essayOnly?'essay':rankByHits?'hits':'article');
     const displayCount=essayOnly?articles.reduce((n,a)=>n+a.essay_question_count,0):law.question_count;
     return articles.length?{...law,articles,displayCount}:null;
-  }).filter(Boolean).sort((a,b)=>b.displayCount-a.displayCount||a.law_name.localeCompare(b.law_name,'zh-Hant'));
+  }).filter(Boolean).sort((a,b)=>(rankByHits||essayOnly?b.displayCount-a.displayCount:0)||a.law_name.localeCompare(b.law_name,'zh-Hant'));
   const articleTotal=filtered.reduce((n,x)=>n+x.articles.length,0),hitTotal=filtered.reduce((n,x)=>n+x.displayCount,0);
+  $('#law-order-label').textContent=essayOnly?'申論題出現過':rankByHits?'依 104～114 年命中題數排序':'依法規條號順序閱讀';
+  $('#law-order-description').textContent=essayOnly?'只顯示歷屆申論題引用過的法條，依申論命中次數排列。':rankByHits?'考過的法規及條文依命中題數置前，未出題條文仍完整保留。':'預設由第一條往後排列；需要時可從類型選單切換命中題數或申論題排序。';
   $('#law-summary').textContent=essayOnly?`${filtered.length} 部法規｜${articleTotal} 條｜申論題命中 ${hitTotal} 次`:`${filtered.length} 部法規｜${articleTotal.toLocaleString()} 條｜${hitTotal} 次考題命中`;
   if(!filtered.length){$('#law-list').innerHTML='<div class="empty-library">找不到符合條件的法條</div>';return}
   $('#law-list').innerHTML=filtered.map((law,index)=>{
@@ -159,8 +161,8 @@ function articleExplanationDetails(article){
   return `<details class="plain-details"><summary><span class="analysis-summary">應試拆解 <em class="importance-badge importance-${importance}">考試重要度：${importance}</em></span><span class="toggle-label">展開閱讀</span></summary><div class="plain-box"><b class="analysis-title">${title}</b><div>${escapeHtml(article.plain_explanation)}</div>${angles}</div></details>`;
 }
 
-function sortLawArticles(articles,essayOnly){
-  return [...articles].sort((a,b)=>(essayOnly?b.essay_question_count-a.essay_question_count:b.question_count-a.question_count)||String(a.article_no).localeCompare(String(b.article_no),'zh-Hant',{numeric:true}));
+function sortLawArticles(articles,orderMode='article'){
+  return [...articles].sort((a,b)=>(orderMode==='essay'?b.essay_question_count-a.essay_question_count:orderMode==='hits'?b.question_count-a.question_count:0)||String(a.article_no).localeCompare(String(b.article_no),'zh-Hant',{numeric:true}));
 }
 
 function renderGlossary(){
