@@ -1,9 +1,9 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>地產國考練習室</title><link rel="stylesheet" href="./styles.css?v=20260823-1"></head><body>
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>地產國考練習室</title><link rel="stylesheet" href="./styles.css?v=20260823-2"></head><body>
 <header class="hero">
   <div class="hero-copy"><small>不動產經紀人｜AI 學習系統</small><h1>把每一次答錯，變成下一次拿分。</h1><aside id="account-panel" class="account-panel" aria-live="polite"><div><b id="account-title">登入後自動保存</b><p id="account-message">使用 Google 帳號登入，可自動同步考試紀錄、錯題、作答進度與法條書籤。</p></div><button type="button" id="google-login">使用 Google 帳號登入</button><button type="button" id="google-logout" class="account-logout" hidden>登出</button></aside></div>
   <div class="hero-entry" role="navigation" aria-label="學習功能">
     <button type="button" class="entry-card active" data-view="exam"><span>01</span><b>考古題考試</b><small>考試與即時複習模式</small></button>
-    <button type="button" class="entry-card" data-view="laws"><span>02</span><b>完整法條</b><small>官方全文與白話解釋</small></button>
+    <button type="button" class="entry-card" data-view="laws"><span>02</span><b>完整法條</b><small>官方全文與應試拆解</small></button>
     <button type="button" class="entry-card" data-view="terms"><span>03</span><b>專有名詞</b><small>高頻觀念白話整理</small></button>
   </div>
 </header>
@@ -15,7 +15,7 @@
   </section>
   <section id="laws-view" class="study-view" hidden>
     <button type="button" id="back-to-question" class="back-to-question" hidden>← 回到原題詳解</button>
-    <div class="library-head"><div><p class="eyebrow">依 104～114 年考題排序</p><h2>完整法條及法條白話解釋</h2><p>條文來自全國法規資料庫；考過的條文依命中題數置前，未出題條文仍完整保留。</p></div><div id="law-summary" class="library-summary"></div></div>
+    <div class="library-head"><div><p class="eyebrow">依 104～114 年考題排序</p><h2>完整法條及應試拆解</h2><p>條文來自全國法規資料庫；考過的條文依命中題數置前，未出題條文仍完整保留。</p></div><div id="law-summary" class="library-summary"></div></div>
     <div class="library-controls"><label>科目<select id="law-subject"></select></label><label>類型<select id="law-category"></select></label><label class="search-field">搜尋<input id="law-search" type="search" placeholder="法規名稱、條號或內容"></label></div>
     <div id="law-list" class="library-list"></div>
   </section>
@@ -25,4 +25,4 @@
     <div id="term-list" class="term-grid"></div>
   </section>
 </main>
-<script src="./app.js?v=20260823-1"></script><script type="module" src="./cloud-sync.js?v=20260823-2"></script></body></html>
+<script src="./app.js?v=20260823-2"></script><script type="module" src="./cloud-sync.js?v=20260823-2"></script></body></html>

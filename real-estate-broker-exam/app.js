@@ -26,7 +26,7 @@ window.addEventListener('study-cloud-signed-out',()=>{
 });
 
 async function init(){
-  [bank,lawLibrary,glossary]=await Promise.all([loadBank(),loadJson('./data/law_library.json?v=20260820-2','laws'),loadJson('./data/glossary.json?v=20260820-2','terms')]);
+  [bank,lawLibrary,glossary]=await Promise.all([loadBank(),loadJson('./data/law_library.json?v=20260823-3','laws'),loadJson('./data/glossary.json?v=20260820-2','terms')]);
   buildLawTermLookup();
   setupLawTermTooltip();
   const years=[...new Set(bank.map(q=>q.exam_year))].sort((a,b)=>b-a);
@@ -153,7 +153,10 @@ function resumeLawBookmark(lawName){
 }
 
 function articleExplanationDetails(article){
-  return `<details class="plain-details"><summary>白話解釋 <span>展開閱讀</span></summary><div class="plain-box">${escapeHtml(article.plain_explanation)}</div></details>`;
+  const importance=['高','中','低'].includes(article.exam_importance)?article.exam_importance:'低';
+  const title=article.analysis_type==='law_significance'?'法條意義':'理解與判斷';
+  const angles=(article.exam_angles||[]).length?`<div class="exam-angle-list"><b>歷屆考法</b><ul>${article.exam_angles.map(item=>`<li>${escapeHtml(item)}</li>`).join('')}</ul></div>`:'';
+  return `<details class="plain-details"><summary><span class="analysis-summary">應試拆解 <em class="importance-badge importance-${importance}">考試重要度：${importance}</em></span><span class="toggle-label">展開閱讀</span></summary><div class="plain-box"><b class="analysis-title">${title}</b><div>${escapeHtml(article.plain_explanation)}</div>${angles}</div></details>`;
 }
 
 function sortLawArticles(articles,essayOnly){
@@ -447,11 +450,11 @@ function returnToQuestion(){
 function completeLawReference(citation,sourceUrl){
   const result=citedOfficialArticles(citation);
   if(!result)return sourceUrl?`<p class="law-source-missing">這項依據尚未收錄在完整法條庫，請直接<a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noreferrer">到官方法規來源核對</a>。</p>`:'';
-  return `<details class="question-law-details"><summary>查看引用的完整法條與白話解釋 <span>展開閱讀</span></summary><div class="question-law-articles">${result.articles.map(article=>`<section><b>${escapeHtml(result.law.law_name)}第 ${escapeHtml(article.article_no)} 條</b><p class="official-text">${lawTermMarkup(article.content)}</p><details class="question-law-plain"><summary>白話解釋 <span>展開閱讀</span></summary><p>${escapeHtml(article.plain_explanation)}</p></details><button type="button" class="open-law-library" data-open-law="${escapeHtml(result.law.law_name)}" data-article-no="${escapeHtml(article.article_no)}">到「完整法條」閱讀</button></section>`).join('')}<a href="${escapeHtml(result.law.source_url)}" target="_blank" rel="noreferrer">到全國法規資料庫核對</a></div></details>`;
+  return `<details class="question-law-details"><summary>查看引用的完整法條與應試拆解 <span>展開閱讀</span></summary><div class="question-law-articles">${result.articles.map(article=>`<section><b>${escapeHtml(result.law.law_name)}第 ${escapeHtml(article.article_no)} 條</b><p class="official-text">${lawTermMarkup(article.content)}</p><details class="question-law-plain"><summary>應試拆解 <span>展開閱讀</span></summary><p>${escapeHtml(article.plain_explanation)}</p></details><button type="button" class="open-law-library" data-open-law="${escapeHtml(result.law.law_name)}" data-article-no="${escapeHtml(article.article_no)}">到「完整法條」閱讀</button></section>`).join('')}<a href="${escapeHtml(result.law.source_url)}" target="_blank" rel="noreferrer">到全國法規資料庫核對</a></div></details>`;
 }
 
 function laws(e){
-  if(e.law_explanations?.length)return `<div class="law-cards">${e.law_explanations.map(item=>`<div class="law-card"><b>${shown(item.citation,'法規依據')}</b><p><strong>本題相關部分（白話）：</strong>${shown(item.meaning,'本題相關部分說明尚待補充')}</p><small>本題用途：${shown(item.use,'作為判斷本題法律效果的規範基礎')}</small>${completeLawReference(item.citation,e.current_law_source_url)}</div>`).join('')}</div>`;
+  if(e.law_explanations?.length)return `<div class="law-cards">${e.law_explanations.map(item=>`<div class="law-card"><b>${shown(item.citation,'法規依據')}</b><p><strong>本題相關規則：</strong>${shown(item.meaning,'本題相關部分說明尚待補充')}</p><small>本題用途：${shown(item.use,'作為判斷本題法律效果的規範基礎')}</small>${completeLawReference(item.citation,e.current_law_source_url)}</div>`).join('')}</div>`;
   return list(e.related_laws);
 }
 function explanationHtml(q){
