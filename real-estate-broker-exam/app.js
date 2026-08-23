@@ -229,7 +229,7 @@ function articleExplanationDetails(article){
   return `<details class="plain-details"><summary><span class="analysis-summary">應試拆解 <em class="importance-badge importance-${importance}">考試重要度：${importance}</em></span><span class="toggle-label">展開閱讀</span></summary><div class="plain-box"><b class="analysis-title">${title}</b><div>${escapeHtml(article.plain_explanation)}</div>${angles}</div></details>`;
 }
 
-+function setupLegalHistory(){
+function setupLegalHistory(){
   const laws=[...new Set(legalHistory.topics.map(topic=>topic.law_name))];
   $('#history-law').innerHTML=laws.map(name=>`<option>${escapeHtml(name)}</option>`).join('');
   refreshHistoryCategories();
