@@ -4,6 +4,7 @@ let glossary=[];
 const LAW_BOOKMARK_STORAGE_KEY='realEstateLawBookmarksV1';
 const lawArticleWindows=new Map();
 let lawBookmarks=loadLawBookmarks();
+let cloudHistory=null;
 let lawResumeTarget=null;
 let lawJumpTarget=null;
 let lawReturnState=null;
@@ -13,6 +14,16 @@ let pinnedLawTerm=null;
 let selectedMode='exam';
 let state={questions:[],index:0,answers:{},graded:{},revealed:new Set(),marked:new Set(),started:0,mode:'exam'};
 const $=selector=>document.querySelector(selector);
+
+window.addEventListener('study-cloud-ready',event=>{
+  cloudHistory=event.detail.history||[];
+  lawBookmarks=event.detail.bookmarks||{};
+  renderLawLibrary();loadDashboard();
+  restoreCloudDraft(event.detail.draft);
+});
+window.addEventListener('study-cloud-signed-out',()=>{
+  cloudHistory=null;lawBookmarks=loadLawBookmarks();renderLawLibrary();loadDashboard();
+});
 
 async function init(){
   [bank,lawLibrary,glossary]=await Promise.all([loadBank(),loadJson('./data/law_library.json?v=20260820-2','laws'),loadJson('./data/glossary.json?v=20260820-2','terms')]);
@@ -122,7 +133,8 @@ function setLawBookmarkSelection(lawName,articleNo,checked){
   if(!lawName||!articleNo)return;
   if(checked)lawBookmarks[lawName]={articleNo,updatedAt:new Date().toISOString()};
   else if(String(lawBookmarks[lawName]?.articleNo||'')===String(articleNo))delete lawBookmarks[lawName];
-  try{localStorage.setItem(LAW_BOOKMARK_STORAGE_KEY,JSON.stringify(lawBookmarks))}catch{}
+  if(window.studyCloud?.isSignedIn())window.studyCloud.saveBookmarks(lawBookmarks);
+  else try{localStorage.setItem(LAW_BOOKMARK_STORAGE_KEY,JSON.stringify(lawBookmarks))}catch{}
   const button=document.querySelector(`[data-law-resume="${CSS.escape(lawName)}"]`);
   const saved=lawBookmarks[lawName]?.articleNo;
   if(button){button.textContent=saved?`🔖 接續第 ${saved} 條`:'🔖 尚未設定';button.disabled=!saved;button.setAttribute('aria-label',saved?`${lawName}接續第 ${saved} 條`:`${lawName}尚未設定書籤`)}
@@ -282,7 +294,10 @@ function reloadSelectedExam(){
   if(state.questions.length)start(100,false);
 }
 
-function history(){return JSON.parse(localStorage.getItem('exam-history')||'[]')}
+function history(){
+  if(Array.isArray(cloudHistory))return cloudHistory;
+  try{return JSON.parse(localStorage.getItem('exam-history')||'[]')}catch{return []}
+}
 function loadDashboard(){
   const records=history(),today=new Date().toISOString().slice(0,10),todays=records.filter(r=>r.date===today);
   const answered=records.reduce((n,r)=>n+r.answered,0),correct=records.reduce((n,r)=>n+r.correct,0);
@@ -297,6 +312,25 @@ function start(limit=100,random=false){
   let questions=bank.filter(q=>q.exam_year===year&&q.subject===subject);
   if(random) questions=[...questions].sort(()=>Math.random()-.5);
   state={questions:questions.slice(0,limit),index:0,answers:{},graded:{},revealed:new Set(),marked:new Set(),started:Date.now(),mode:selectedMode};
+  $('#empty').hidden=true;$('#result').hidden=true;$('#runner').hidden=false;render();scheduleDraftSave();
+}
+
+function draftSnapshot(){
+  if(!state.questions.length||$('#runner').hidden)return null;
+  return {questionIds:state.questions.map(q=>q.id),index:state.index,answers:state.answers,graded:state.graded,revealed:[...state.revealed],marked:[...state.marked],started:state.started,mode:state.mode,examYear:state.questions[0]?.exam_year,subject:state.questions[0]?.subject};
+}
+
+function scheduleDraftSave(){
+  const draft=draftSnapshot();if(draft&&window.studyCloud?.isSignedIn())window.studyCloud.saveDraft(draft);
+}
+
+function restoreCloudDraft(draft){
+  if(!draft?.questionIds?.length||state.questions.length)return;
+  const questions=draft.questionIds.map(id=>bank.find(q=>String(q.id)===String(id))).filter(Boolean);
+  if(!questions.length||!confirm(`找到一份未完成的${draft.subject||''}試卷（已作答 ${Object.keys(draft.answers||{}).length} 題），要接著作答嗎？`))return;
+  selectedMode=draft.mode==='review'?'review':'exam';
+  state={questions,index:Math.min(Number(draft.index)||0,questions.length-1),answers:draft.answers||{},graded:draft.graded||{},revealed:new Set(draft.revealed||[]),marked:new Set(draft.marked||[]),started:Number(draft.started)||Date.now(),mode:selectedMode};
+  document.querySelectorAll('[data-mode]').forEach(button=>button.classList.toggle('active',button.dataset.mode===selectedMode));
   $('#empty').hidden=true;$('#result').hidden=true;$('#runner').hidden=false;render();
 }
 
@@ -342,18 +376,18 @@ $('#options').onclick=event=>{
   if(state.mode==='review'&&state.graded[q.id])return;
   state.answers[q.id]=button.dataset.answer;
   if(state.mode==='review')state.graded[q.id]={answer:button.dataset.answer,isCorrect:answerIsCorrect(button.dataset.answer,q.official_answer)};
-  render();
+  render();scheduleDraftSave();
 };
-$('#essay').oninput=event=>state.answers[state.questions[state.index].id]=event.target.value;
+$('#essay').oninput=event=>{state.answers[state.questions[state.index].id]=event.target.value;scheduleDraftSave()};
 $('#show-reference').onclick=()=>{
   const q=state.questions[state.index];
   if(state.mode!=='review'||q.question_type!=='essay')return;
   state.revealed.has(q.id)?state.revealed.delete(q.id):state.revealed.add(q.id);
   render();
 };
-$('#nav').onclick=event=>{const button=event.target.closest('[data-index]');if(button){state.index=Number(button.dataset.index);render()}};
-$('#prev').onclick=()=>{state.index=Math.max(0,state.index-1);render()};$('#next').onclick=()=>{state.index=Math.min(state.questions.length-1,state.index+1);render()};
-$('#mark').onclick=()=>{const id=state.questions[state.index].id;state.marked.has(id)?state.marked.delete(id):state.marked.add(id);render()};
+$('#nav').onclick=event=>{const button=event.target.closest('[data-index]');if(button){state.index=Number(button.dataset.index);render();scheduleDraftSave()}};
+$('#prev').onclick=()=>{state.index=Math.max(0,state.index-1);render();scheduleDraftSave()};$('#next').onclick=()=>{state.index=Math.min(state.questions.length-1,state.index+1);render();scheduleDraftSave()};
+$('#mark').onclick=()=>{const id=state.questions[state.index].id;state.marked.has(id)?state.marked.delete(id):state.marked.add(id);render();scheduleDraftSave()};
 
 function list(items){return `<ul>${(items||[]).map(x=>`<li>${x}</li>`).join('')}</ul>`}
 function shown(value,fallback='尚未提供'){return value===undefined||value===null||value===''?fallback:value}
@@ -441,7 +475,10 @@ $('#submit').onclick=()=>{
   if(!confirm(message))return;
   let correct=0,incorrect=0,unanswered=0;
   const details=state.questions.map(q=>{const answer=state.answers[q.id];if(q.question_type==='multiple_choice'){if(q.official_answer==='ALL')correct++;else if(!answer)unanswered++;else if(answerIsCorrect(answer,q.official_answer))correct++;else incorrect++}return{q,answer,isCorrect:q.question_type==='multiple_choice'?answerIsCorrect(answer,q.official_answer):null}});
-  const gradable=correct+incorrect,score=gradable?Math.round(correct/gradable*100):0,records=history();records.push({date:new Date().toISOString().slice(0,10),answered:gradable,correct,score});localStorage.setItem('exam-history',JSON.stringify(records));
+  const gradable=correct+incorrect,score=gradable?Math.round(correct/gradable*100):0,records=history();
+  const attempt={date:new Date().toISOString().slice(0,10),answered:gradable,correct,incorrect,unanswered,score,examYear:state.questions[0]?.exam_year,subject:state.questions[0]?.subject,mode:state.mode,durationSeconds:Math.max(0,Math.round((Date.now()-state.started)/1000)),responses:details.map(({q,answer,isCorrect})=>({questionId:q.id,questionNumber:q.question_number,questionType:q.question_type,answer:answer||null,isCorrect}))};
+  records.push(attempt);
+  if(window.studyCloud?.isSignedIn()){window.studyCloud.saveAttempt(attempt);window.studyCloud.clearDraft()}else localStorage.setItem('exam-history',JSON.stringify(records));
   $('#runner').hidden=true;$('#result').hidden=false;
   $('#result').innerHTML=`<h2>${score} 分</h2><p>答對 ${correct}｜答錯 ${incorrect}｜未作答 ${unanswered}</p>`+details.map(({q,answer,isCorrect})=>`<div class="review"><b>第 ${q.question_number} 題｜${q.question_type==='composition'?'作文':q.question_type==='essay'?'申論':'單選'}</b><p>${q.question_text}</p>${reviewOptions(q,answer)}${q.question_type==='multiple_choice'?`<p class="${isCorrect?'correct':'wrong'}">你的答案：${answer||'未作答'}　官方答案：${officialAnswerLabel(q.official_answer)}</p>`:`<p><b>你的作答：</b>${answer||'未作答'}</p>`}<button class="show-explanation">${q.question_type==='composition'?'查看作文分析':q.question_type==='essay'?'查看參考答案':'AI 詳解'}</button><div class="ai" hidden>${explanationHtml(q)}</div></div>`).join('');
   document.querySelectorAll('.show-explanation').forEach(button=>button.onclick=()=>button.nextElementSibling.hidden=!button.nextElementSibling.hidden);loadDashboard();
