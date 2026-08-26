@@ -51,7 +51,7 @@ async function loadJson(url,key){
 }
 
 async function loadLegalHistory(){
-  const response=await fetch('./data/legal_history.json?v=20260826-1');
+  const response=await fetch('./data/legal_history.json?v=20260827-1');
   if(!response.ok)return {topics:[],links:[]};
   const data=await response.json();
   return {topics:Array.isArray(data.topics)?data.topics:[],links:Array.isArray(data.links)?data.links:[]};
