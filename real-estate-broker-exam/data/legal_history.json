@@ -263,6 +263,319 @@
       "why_current_law": "第219條規定未依計畫開始或使用時的收回要件；第219條之1進一步要求每年通知、公告，使原所有權人有資訊判斷是否行使權利。",
       "exam_memory": "徵收目的失去，收回權才有空間；219看收回要件，219-1看資訊通知與期間保障。",
       "sources": [{"source_title": "土地法增訂第219條之1條文", "source_url": "https://www.ly.gov.tw/Pages/Detail.aspx?nodeid=33324&pid=215770", "source_type": "立法院", "verified": true, "notes": "核對釋字763號影響與增訂理由。"}, {"source_title": "土地法沿革", "source_url": "https://law.moj.gov.tw/LawClass/LawHistory.aspx?pcode=D0060001", "source_type": "全國法規資料庫", "verified": true, "notes": "核對第219條修正及第219條之1增訂日期。"}]
+    },
+    {
+      "id": "civil-majority-age",
+      "law_name": "民法",
+      "title": "成年年齡為什麼從二十歲降為十八歲？",
+      "category": "總則與行為能力",
+      "priority": "high",
+      "content_status": "verified",
+      "keywords": ["成年年齡", "十八歲", "二十歲", "行為能力", "限制行為能力人", "民法第12條", "民法第13條"],
+      "one_liner": "民國112年起，民法成年年齡由二十歲降為十八歲；判斷歷屆題目時，必須先看法律行為發生在新法施行前或後，不能直接用今天的年齡標準改掉當年答案。",
+      "timeline": [
+        {"year": "民國18年（1929）", "title": "民法總則制定", "description": "民法第12條以二十歲作為成年年齡，成為長期適用的行為能力分界。", "verified": true},
+        {"year": "民國110年1月13日", "title": "成年年齡修正公布", "description": "第12、13條等條文修正，將成年年齡由二十歲降為十八歲，並連動調整結婚、收養等規定。", "verified": true},
+        {"year": "民國112年1月1日", "title": "新制施行", "description": "滿十八歲者原則上具有完全行為能力；此前發生的法律行為仍須依當時法規判斷。", "verified": true}
+      ],
+      "what_happened": "民法原以二十歲作為成年界線，但其他公共制度與社會生活已大量以十八歲作為承擔權利義務的年齡。修法除了改第12條，也同步處理未成年人、結婚、收養及監護等連動規定，避免同一個人在不同制度中出現落差。",
+      "why_current_law": "現行法以十八歲為成年年齡，滿十八歲者原則上可獨立締約及處分財產。考古題若發生於民國111年底以前，當時十八、十九歲者仍可能是限制行為能力人；因此作答必須先定時間，再判斷法定代理人允許、承認或純獲法律上利益等規則。",
+      "exam_memory": "先看時間再看年齡：112年起十八歲成年；舊題的十八、十九歲仍可能是限制行為能力人。",
+      "sources": [
+        {"source_title": "民法沿革", "source_url": "https://law.moj.gov.tw/LawClass/LawHistory.aspx?pcode=B0000001", "source_type": "全國法規資料庫", "verified": true, "notes": "核對民國110年修正公布及民國112年1月1日施行。"},
+        {"source_title": "民法現行條文", "source_url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=B0000001", "source_type": "全國法規資料庫", "verified": true, "notes": "核對第12、13條現行行為能力規定。"}
+      ]
+    },
+    {
+      "id": "civil-interest-cap",
+      "law_name": "民法",
+      "title": "約定利率上限為什麼從年息百分之二十降為百分之十六？",
+      "category": "債與利息",
+      "priority": "high",
+      "content_status": "verified",
+      "keywords": ["利率", "最高利率", "約定利率", "百分之十六", "百分之二十", "民法第205條"],
+      "one_liner": "民法第205條的約定利率上限已由年息百分之二十降為百分之十六，超過部分無效；這和沒有約定利率時適用的法定年利率百分之五，是兩個不同問題。",
+      "timeline": [
+        {"year": "舊制", "title": "約定利率上限為年息百分之二十", "description": "歷屆舊題可能以百分之二十作為最高約定利率。", "verified": true},
+        {"year": "民國110年1月20日", "title": "第205條修正公布", "description": "最高約定利率調降為年息百分之十六，並明定超過部分無效。", "verified": true},
+        {"year": "公布後六個月", "title": "新上限施行", "description": "新制施行後，超過年息百分之十六的約定部分不生效力。", "verified": true}
+      ],
+      "what_happened": "借款人與貸與人形式上可以自由約定利率，但資力與資訊通常不對等；若只靠契約自由，過高利率可能使債務快速累積。修法因此降低可受法律保護的最高約定利率，並把超過部分的法律效果直接定為無效。",
+      "why_current_law": "現行第205條處理的是『雙方有約定時，法律最多承認到多少』；第203條的法定年利率百分之五，則是在應付利息而未約定利率時補充適用。考題常把兩者互換，或以舊制百分之二十混入現行題目。",
+      "exam_memory": "沒約定看法定利率百分之五；有約定看最高上限百分之十六。舊題才可能出現百分之二十。",
+      "sources": [
+        {"source_title": "民法沿革", "source_url": "https://law.moj.gov.tw/LawClass/LawHistory.aspx?pcode=B0000001", "source_type": "全國法規資料庫", "verified": true, "notes": "核對民國110年1月20日第205條修正及公布後六個月施行。"},
+        {"source_title": "民法現行條文", "source_url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=B0000001", "source_type": "全國法規資料庫", "verified": true, "notes": "核對第203條法定利率與第205條最高約定利率。"}
+      ]
+    },
+    {
+      "id": "civil-property-reform",
+      "law_name": "民法",
+      "title": "民法物權編為什麼在民國98、99年大幅修正？",
+      "category": "物權與不動產",
+      "priority": "high",
+      "content_status": "verified",
+      "keywords": ["物權編", "登記", "共有", "抵押權", "最高限額抵押權", "民法第758條", "民法第826條之1"],
+      "one_liner": "物權編修法把登記、公示、共有物使用管理及抵押權制度重新整理；考試不能只背單一條文，還要辨認舊法題目是否落在新制施行前。",
+      "timeline": [
+        {"year": "民國98年1月23日", "title": "物權通則及所有權部分修正", "description": "修正第757條以下多項條文，增訂第759條之1、第826條之1等規定，並於公布後六個月施行。", "verified": true},
+        {"year": "民國99年2月3日", "title": "用益物權及擔保物權部分修正", "description": "大幅修正地上權、農育權、抵押權等制度，並增訂最高限額抵押權相關規定。", "verified": true},
+        {"year": "今天", "title": "以公示、交易安全與彈性利用並重", "description": "不動產物權仍以登記為核心，但共有物管理與擔保制度已有更細緻的法定規則。", "verified": true}
+      ],
+      "what_happened": "早期物權編部分制度與現代不動產融資、長期土地利用及複雜共有關係不完全相稱。民國98、99年的分階段修法，先整理物權通則與所有權，再處理用益物權及擔保物權，使登記效力、共有物使用管理及抵押權運作更明確。",
+      "why_current_law": "現行第758條仍要求不動產物權依法律行為取得、設定、喪失或變更者須經登記；第759條之1處理登記推定力，第826條之1讓共有物使用管理約定在登記後可對抗受讓人。抵押權部分則要區分普通抵押權與最高限額抵押權。",
+      "exam_memory": "物權題先抓三件事：有沒有登記、對誰有效、是普通抵押權還是最高限額抵押權。",
+      "sources": [
+        {"source_title": "民法沿革", "source_url": "https://law.moj.gov.tw/LawClass/LawHistory.aspx?pcode=B0000001", "source_type": "全國法規資料庫", "verified": true, "notes": "核對民國98、99年物權編分階段修正的日期與條文範圍。"},
+        {"source_title": "民法現行條文", "source_url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=B0000001", "source_type": "全國法規資料庫", "verified": true, "notes": "核對登記、共有物使用管理及抵押權現行規定。"}
+      ]
+    },
+    {
+      "id": "equalization-real-price-registration",
+      "law_name": "平均地權條例",
+      "title": "實價登錄如何從成交後申報走到買賣雙方共同申報？",
+      "category": "交易透明與實價登錄",
+      "priority": "high",
+      "content_status": "verified",
+      "keywords": ["實價登錄", "實價登錄1.0", "實價登錄2.0", "共同申報", "成交資訊", "平均地權條例第47條"],
+      "one_liner": "實價登錄從民國101年上路，歷經揭露方式與申報責任調整，現行買賣案件原則上由權利人及義務人在申請移轉登記時共同申報。",
+      "timeline": [
+        {"year": "民國100年12月30日", "title": "建立實價登錄法源", "description": "平均地權條例修正第47條並增訂罰則，相關規定定自民國101年8月1日施行。", "verified": true},
+        {"year": "民國101年8月1日", "title": "實價登錄1.0上路", "description": "不動產成交資訊開始依法申報登錄；舊題常以登記辦竣後一定期間內申報作答。", "verified": true},
+        {"year": "民國108年修法、109年7月1日施行", "title": "揭露與查核制度調整", "description": "第47條及罰則修正，實價資訊揭露逐步走向更完整。", "verified": true},
+        {"year": "民國110年7月1日", "title": "實價登錄2.0施行", "description": "買賣雙方於申請所有權移轉登記時共同申報，並強化查核及門牌、地號完整揭露。", "verified": true}
+      ],
+      "what_happened": "不動產價格資訊過去分散在交易當事人與業者手中，一般買方難以比較真實成交行情。實價登錄先建立申報資料庫，後續再調整申報時點、責任主體、揭露粒度與查核權限，降低延遲、漏報及價格資訊過度模糊的問題。",
+      "why_current_law": "現行第47條將買賣案件的申報與所有權移轉登記結合，由權利人及義務人共同申報。預售屋另依第47條之3辦理銷售備查及簽訂、解除契約申報；考題必須先分成成屋買賣、預售屋與租賃案件。",
+      "exam_memory": "先分交易類型，再背申報人與時點：成屋移轉看47條；預售屋簽約、解約看47條之3。",
+      "sources": [
+        {"source_title": "平均地權條例沿革", "source_url": "https://law.moj.gov.tw/LawClass/LawHistory.aspx?pcode=D0060009", "source_type": "全國法規資料庫", "verified": true, "notes": "核對民國100、108、110年修法及施行日期。"},
+        {"source_title": "平均地權條例現行條文", "source_url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=D0060009", "source_type": "全國法規資料庫", "verified": true, "notes": "核對第47條及第47條之3現行申報規則。"}
+      ]
+    },
+    {
+      "id": "equalization-presale-anti-speculation",
+      "law_name": "平均地權條例",
+      "title": "預售屋換約與炒作管制為什麼愈來愈嚴格？",
+      "category": "預售屋與市場秩序",
+      "priority": "high",
+      "content_status": "verified",
+      "keywords": ["預售屋", "換約", "轉售", "炒作", "私法人購屋", "47-4", "47-5", "平均地權條例"],
+      "one_liner": "現行法原則禁止預售屋及新建成屋買受人任意讓與或轉售契約，並處罰散布不實資訊、虛偽交易與壟斷轉售等炒作行為。",
+      "timeline": [
+        {"year": "民國110年7月1日", "title": "預售屋申報與紅單轉售管制施行", "description": "增訂第47條之3，建立預售屋銷售備查、簽約申報及收受定金書面契據不得轉售等規則。", "verified": true},
+        {"year": "民國112年2月8日", "title": "平均地權條例修法公布", "description": "增訂第47條之4、第47條之5及相關罰則，並建立私法人購屋許可制度。", "verified": true},
+        {"year": "民國112年7月1日", "title": "換約與炒作新制施行", "description": "預售屋、新建成屋契約原則不得讓與或轉售；法定親屬及經核准的特殊情形例外。", "verified": true}
+      ],
+      "what_happened": "預售屋在尚未完成所有權登記前，即可能透過定金書據或契約反覆轉售；若短期加價換約、虛偽交易或大量買入形成市場熱度，價格可能脫離真實居住需求。制度因此從資訊申報，進一步走向限制換約、禁止炒作與加重處罰。",
+      "why_current_law": "第47條之3管銷售備查、簽約申報及紅單；第47條之4管買賣契約讓與或轉售；第47條之5禁止散布不實資訊、通謀虛偽交易及明顯影響市場秩序的炒作。私法人購買住宅則另受第79條之1許可與五年移轉限制。",
+      "exam_memory": "紅單看47-3、換約看47-4、炒作看47-5、私法人購屋看79-1；四組規則不要混在同一題。",
+      "sources": [
+        {"source_title": "平均地權條例沿革", "source_url": "https://law.moj.gov.tw/LawClass/LawHistory.aspx?pcode=D0060009", "source_type": "全國法規資料庫", "verified": true, "notes": "核對民國110、112年修法及施行日期。"},
+        {"source_title": "平均地權條例現行條文", "source_url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=D0060009", "source_type": "全國法規資料庫", "verified": true, "notes": "核對第47條之3至之5、第79條之1及罰則。"}
+      ]
+    },
+    {
+      "id": "house-tax-2",
+      "law_name": "房屋稅條例",
+      "title": "房屋稅2.0如何改變自住、出租與多屋持有的課稅？",
+      "category": "持有稅制",
+      "priority": "high",
+      "content_status": "verified",
+      "keywords": ["房屋稅2.0", "全國歸戶", "差別稅率", "自住", "非自住", "囤房稅", "房屋稅條例第5條"],
+      "one_liner": "房屋稅2.0把非自住住家用房屋改為全國歸戶並採差別稅率，也重新整理自住、出租、待售與空置房屋的稅率及申報規則。",
+      "timeline": [
+        {"year": "民國103年6月4日", "title": "非自住住家稅率區間提高", "description": "第5條修正，地方政府得在法定區間內訂定非自住住家用房屋稅率。", "verified": true},
+        {"year": "民國113年1月3日", "title": "房屋稅2.0修正公布", "description": "修正第4至7條等規定，增訂第6條之1，重整住家用房屋分類、戶數計算與徵收制度。", "verified": true},
+        {"year": "民國113年7月1日", "title": "核心新制施行", "description": "全國歸戶、差別稅率、自住戶籍要件及新的課稅期間等核心規則開始適用。", "verified": true}
+      ],
+      "what_happened": "舊制下，非自住住家用房屋的持有戶數與稅率主要由各地方規範，跨縣市持有不容易完整反映。房屋稅2.0改以全國持有戶數為重要基礎，並區分自住、申報租賃所得的出租房、起造人待售房屋及其他非自住房屋。",
+      "why_current_law": "第5條現行架構先分住家與非住家，再把住家細分四類；地方政府須依全國總持有戶數訂定差別稅率。自住除戶數限制外，還要求本人、配偶或直系親屬設籍且無出租、營業。第6條之1則把納稅義務基準日、課稅期間與五月開徵寫入法律。",
+      "exam_memory": "房屋稅2.0三關：先分用途、再算全國戶數、最後查設籍與出租情形。舊題的1.5%至3.6%不能直接套到現行空置住宅。",
+      "sources": [
+        {"source_title": "房屋稅條例沿革", "source_url": "https://law.moj.gov.tw/LawClass/LawHistory.aspx?pcode=G0340102", "source_type": "全國法規資料庫", "verified": true, "notes": "核對民國103、113年修法與民國113年7月1日施行。"},
+        {"source_title": "房屋稅條例現行條文", "source_url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=G0340102", "source_type": "全國法規資料庫", "verified": true, "notes": "核對第5、6、6條之1、7及15條現行規定。"}
+      ]
+    },
+    {
+      "id": "integrated-housing-land-tax",
+      "law_name": "所得稅法",
+      "title": "房地合一稅如何從1.0走到2.0？",
+      "category": "交易所得稅",
+      "priority": "high",
+      "content_status": "verified",
+      "keywords": ["房地合一", "房地合一1.0", "房地合一2.0", "持有期間", "預售屋", "股權交易", "所得稅法第14條之4"],
+      "one_liner": "房地合一1.0自民國105年起把房屋與土地交易所得合併計算；2.0自民國110年7月起擴及預售屋及特定股權交易，並調整短期持有期間與稅率。",
+      "timeline": [
+        {"year": "民國104年6月24日", "title": "房地合一1.0修法公布", "description": "增訂第4條之4、第14條之4至之8等規定，建立房屋、土地交易所得分離課稅制度。", "verified": true},
+        {"year": "民國105年1月1日", "title": "房地合一1.0施行", "description": "原則適用於民國105年起取得的房屋、土地；自住優惠與持有期間稅率開始成為考試重點。", "verified": true},
+        {"year": "民國110年4月28日", "title": "房地合一2.0修法公布", "description": "修正第4條之4、之5及第14條之4至之6等規定。", "verified": true},
+        {"year": "民國110年7月1日", "title": "房地合一2.0施行", "description": "擴大課稅範圍至預售屋及符合條件的股權交易，並延長短期交易的高稅率期間。", "verified": true}
+      ],
+      "what_happened": "土地交易過去有所得稅免稅與土地增值稅並存的分離結構，房屋與土地價格分配可能影響所得稅結果。房地合一制度改以交易總價扣除成本費用，再減除土地漲價總數額，計算應課所得；2.0則針對短期交易、預售屋與以股權形式移轉不動產的規避空間再補強。",
+      "why_current_law": "第4條之4決定哪些交易納入，包括房屋土地、預售屋及特定股權交易；第14條之4處理個人交易所得、持有期間與稅率；第4條之5規定自住及特定土地免稅。土地增值稅仍另行存在，計算時以減除土地漲價總數額避免同一漲價部分重複負擔。",
+      "exam_memory": "先判取得日與交易標的，再算持有期間；1.0與2.0最大陷阱是預售屋、股權交易及短期稅率期間。",
+      "sources": [
+        {"source_title": "所得稅法沿革", "source_url": "https://law.moj.gov.tw/LawClass/LawHistory.aspx?pcode=G0340003", "source_type": "全國法規資料庫", "verified": true, "notes": "核對民國104年1.0及民國110年2.0修法、施行日期。"},
+        {"source_title": "所得稅法現行條文", "source_url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=G0340003", "source_type": "全國法規資料庫", "verified": true, "notes": "核對第4條之4、之5及第14條之4至之6現行規定。"}
+      ]
+    },
+    {
+      "id": "broker-professional-regulation",
+      "law_name": "不動產經紀業管理條例",
+      "title": "不動產仲介為什麼從一般商業服務走向專業管理？",
+      "category": "經紀業與交易責任",
+      "priority": "high",
+      "content_status": "verified",
+      "keywords": ["不動產經紀業", "仲介", "代銷", "經紀人", "營業保證金", "實價登錄", "不動產說明書"],
+      "one_liner": "不動產交易金額高、資訊不對稱且履約期間長，因此法律把業者許可、專業人員、營業保證金、文件簽章與損害賠償納入一套管理制度。",
+      "timeline": [
+        {"year": "民國88年2月3日", "title": "條例制定公布", "description": "制定全文40條，建立經紀業許可、經紀人員資格與交易責任的專法架構。", "verified": true},
+        {"year": "民國90年10月31日", "title": "專業管理制度大幅調整", "description": "修正經紀業設立、經紀人員、業務文件及責任等多項條文。", "verified": true},
+        {"year": "民國100年修法、101年8月1日施行", "title": "增訂實價登錄義務", "description": "增訂第24條之1、之2及罰則，讓經紀業成為早期實價登錄制度的重要申報主體。", "verified": true},
+        {"year": "民國110年7月1日", "title": "配合實價登錄2.0調整", "description": "第24條之1、29條等修正施行，買賣案件申報責任改由平均地權條例的買賣雙方共同申報架構處理。", "verified": true}
+      ],
+      "what_happened": "仲介或代銷掌握物件、價格、權利狀態及契約流程，但消費者通常只偶爾買賣一次房屋，資訊與經驗明顯不對等。條例因此不是只管公司登記，而是從許可、專任經紀人、營業保證金到不動產說明書與文件簽章，建立可追究的專業責任。",
+      "why_current_law": "現行法要求經紀業經許可並加入公會後營業，配置一定數額的經紀人員；重要交易文件須由經紀人簽章，經紀業對受僱人執行仲介或代銷業務所生損害負賠償責任。實價登錄則要區分歷史版本，不能把民國101年的業者申報規則直接套用現行成屋買賣。",
+      "exam_memory": "經紀業考題四層：能不能營業、誰能執行、哪些文件要簽章、出事由誰賠；實價登錄另先定法律版本。",
+      "sources": [
+        {"source_title": "不動產經紀業管理條例沿革", "source_url": "https://law.moj.gov.tw/LawClass/LawHistory.aspx?pcode=D0060066", "source_type": "全國法規資料庫", "verified": true, "notes": "核對民國88年制定、90年修正及100、110年實價登錄相關修法。"},
+        {"source_title": "不動產經紀業管理條例現行條文", "source_url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=D0060066", "source_type": "全國法規資料庫", "verified": true, "notes": "核對許可、經紀人員、文件簽章、營業保證金與損害賠償規定。"}
+      ]
+    },
+    {
+      "id": "land-expropriation-act-origin",
+      "law_name": "土地徵收條例",
+      "title": "土地徵收為什麼需要從土地法抽出一部專法？",
+      "category": "徵收正當程序",
+      "priority": "high",
+      "content_status": "verified",
+      "keywords": ["土地徵收條例", "公益性", "必要性", "協議價購", "公聽會", "聽證", "財產權"],
+      "one_liner": "土地徵收條例把散見於土地法的徵收程序、補償、區段徵收與收回權集中規範；現行徵收不只要有公共事業，還要檢驗公益性、必要性及程序保障。",
+      "timeline": [
+        {"year": "民國89年2月2日", "title": "土地徵收條例制定", "description": "制定全文63條，把一般徵收、區段徵收、補償及後續處理建立為專法。", "verified": true},
+        {"year": "民國101年1月4日", "title": "大幅修正徵收制度", "description": "增訂第3條之1、第18條之1等規定，並修正協議取得、審議與補償制度。", "verified": true},
+        {"year": "今天", "title": "公益與必要性成為核心審查", "description": "需用土地人應選擇適當範圍、儘量避免耕地，並先辦公聽會、協議價購，再依法申請徵收。", "verified": true}
+      ],
+      "what_happened": "徵收會強制移轉私人土地，不能只用『政府要蓋公共設施』作為全部理由。專法化讓申請、審議、公告、補償、遷移、區段徵收與收回權有較完整的程序，也使土地所有權人與利害關係人能在徵收前表達意見。",
+      "why_current_law": "第3條之1要求勘選適當用地並考量公益性、必要性；第10條要求事業計畫前舉行公聽會，特定重大建設有爭議時可能須舉行聽證；第11條原則上先協議價購或以其他方式取得。考題若只說『屬公共事業即可徵收』，通常省略了必要程序。",
+      "exam_memory": "徵收四問：有無法定事業、是否公益必要、是否先協議並聽取意見、補償是否依法完成。",
+      "sources": [
+        {"source_title": "土地徵收條例沿革", "source_url": "https://law.moj.gov.tw/LawClass/LawHistory.aspx?pcode=D0060058", "source_type": "全國法規資料庫", "verified": true, "notes": "核對民國89年制定及101年大幅修正。"},
+        {"source_title": "土地徵收條例現行條文", "source_url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=D0060058", "source_type": "全國法規資料庫", "verified": true, "notes": "核對公益性、必要性、公聽會、聽證與協議取得規定。"}
+      ]
+    },
+    {
+      "id": "land-expropriation-market-value",
+      "law_name": "土地徵收條例",
+      "title": "徵收補償為什麼改採市價，區段徵收又為什麼可以領抵價地？",
+      "category": "補償與區段徵收",
+      "priority": "high",
+      "content_status": "verified",
+      "keywords": ["市價補償", "公告土地現值", "抵價地", "區段徵收", "土地徵收條例第30條", "土地徵收條例第44條"],
+      "one_liner": "民國101年修法後，被徵收土地原則上按徵收當期市價補償；區段徵收則容許原所有權人以補償權利價值領回抵價地，分享整體開發後的土地。",
+      "timeline": [
+        {"year": "民國89年（2000）", "title": "專法建立補償與區段徵收架構", "description": "土地徵收條例制定時，即將一般徵收與區段徵收分章規範。", "verified": true},
+        {"year": "民國101年1月4日", "title": "第30條改採市價補償", "description": "修正地價補償基準，現行規定以徵收當期市價補償被徵收土地。", "verified": true},
+        {"year": "民國101年9月1日", "title": "市價補償規定施行", "description": "第30條依行政院命令自民國101年9月1日施行。", "verified": true}
+      ],
+      "what_happened": "若補償只依公告土地現值而明顯低於一般交易價格，原所有權人可能無法以補償款取得相當土地，財產權損失也難以填補。市價補償用意在使補償更接近徵收當期的市場價值；區段徵收則因整區重整，另設抵價地讓原所有權人以權利價值領回開發後土地。",
+      "why_current_law": "第30條規定一般被徵收土地按當期市價補償，公共設施保留地有毗鄰平均市價規則；第40條以下處理區段徵收抵價地申請，第44條規範開發後土地的分配與處理。抵價地不是原地原面積返還，而是依應領補償費占總補償地價的權利價值折算。",
+      "exam_memory": "一般徵收重點是當期市價；區段徵收再問是否申領抵價地。抵價地按權利價值算，不等於原地原面積。",
+      "sources": [
+        {"source_title": "土地徵收條例沿革", "source_url": "https://law.moj.gov.tw/LawClass/LawHistory.aspx?pcode=D0060058", "source_type": "全國法規資料庫", "verified": true, "notes": "核對第30條民國101年修正及同年9月1日施行。"},
+        {"source_title": "土地徵收條例現行條文", "source_url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=D0060058", "source_type": "全國法規資料庫", "verified": true, "notes": "核對第30條市價補償與第40至44條抵價地制度。"}
+      ]
+    },
+    {
+      "id": "condominium-management-evolution",
+      "law_name": "公寓大廈管理條例",
+      "title": "為什麼集合住宅需要區分所有權人會議與管理委員會？",
+      "category": "社區治理",
+      "priority": "high",
+      "content_status": "verified",
+      "keywords": ["區分所有權人會議", "管理委員會", "管理負責人", "規約", "公寓大廈管理條例"],
+      "one_liner": "集合住宅把個人所有的專有部分與全體共有的公共設施綁在一起，單靠民法共有規則難以處理日常管理，因此建立會議、規約與管理組織。",
+      "timeline": [
+        {"year": "民國84年6月28日", "title": "公寓大廈管理條例制定", "description": "制定全文52條，首次以專法完整處理區分所有、住戶關係及管理組織。", "verified": true},
+        {"year": "民國92年12月31日", "title": "全文修正", "description": "全文修正為63條，重整區分所有權人會議、管理委員會、規約及起造人點交等制度。", "verified": true},
+        {"year": "今天", "title": "以住戶自治搭配法定底線", "description": "社區可用規約與會議決議管理共同事務，但不得違反法律強制規定或侵害專有權的核心。", "verified": true}
+      ],
+      "what_happened": "同一棟建築物中，住戶各自擁有住宅，卻共同使用樓梯、外牆、屋頂、基地與管線。若每項修繕或使用都要求全體一致同意，社區很難運作；若完全交由少數人決定，又可能侵害個別所有權人。因此法律設計區分所有權人會議作為意思決定機關，並由管理委員會或管理負責人執行。",
+      "why_current_law": "第23條規定住戶關係原則上可由規約約定，但約定專用、財務監督及禁止飼養動物等重要事項須載明才生效；第25條以下規範會議召集與決議；第29條要求成立管理委員會或推選管理負責人。",
+      "exam_memory": "社區治理三層：會議作決定、規約定長期規則、管委會負責執行；三者權限不能互換。",
+      "sources": [
+        {"source_title": "公寓大廈管理條例沿革", "source_url": "https://law.moj.gov.tw/LawClass/LawHistory.aspx?pcode=D0070118", "source_type": "全國法規資料庫", "verified": true, "notes": "核對民國84年制定及92年全文修正。"},
+        {"source_title": "公寓大廈管理條例現行條文", "source_url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=D0070118", "source_type": "全國法規資料庫", "verified": true, "notes": "核對規約、會議、管理委員會與管理負責人制度。"}
+      ]
+    },
+    {
+      "id": "condominium-common-safety",
+      "law_name": "公寓大廈管理條例",
+      "title": "外牆、樓梯與公共基金為什麼不能只看個別住戶意願？",
+      "category": "共用部分與公共安全",
+      "priority": "high",
+      "content_status": "verified",
+      "keywords": ["共用部分", "約定專用", "外牆", "公共基金", "防墜設施", "危險公寓大廈"],
+      "one_liner": "外牆、主要結構、避難通路與公共基金同時影響整棟安全及全體財產價值，所以有些部分依法不得約定專用，也不能由單一住戶任意變更。",
+      "timeline": [
+        {"year": "民國84年（1995）", "title": "專法建立共用部分管理", "description": "條例制定後，專有部分、共用部分與約定專用有了明確管理架構。", "verified": true},
+        {"year": "民國92年（2003）", "title": "全文修正強化管理與點交", "description": "重整共用部分、公共基金及起造人與管理組織間的點交責任。", "verified": true},
+        {"year": "民國105年11月16日", "title": "外牆與公共基金條文修正", "description": "修正第8、18條，調整外牆行為限制及公共基金相關規定。", "verified": true},
+        {"year": "民國111年5月11日", "title": "增訂危險社區管理機制", "description": "增訂第29條之1及49條之1，對有危險之虞且未成立管理組織的公寓大廈建立輔導、指定及處罰機制。", "verified": true}
+      ],
+      "what_happened": "外牆開孔、屋頂占用、樓梯堆物或公共設施欠缺維護，看似只是某一住戶的使用選擇，卻可能影響逃生、結構、防水及整體外觀。公共基金則讓跨年度的大型修繕不必臨時向每戶追收，避免管理組織因沒有資金而無法處理安全問題。",
+      "why_current_law": "第7條列出不得約定專用的共用部分；第8條限制外牆、樓頂平臺及防空避難設備的變更，但對兒童、老人防墜設施設有條件例外；第18條要求設置公共基金；第29條之1則處理有危險之虞且欠缺管理組織的社區。",
+      "exam_memory": "先判專有或共用，再查能否約定專用；碰到結構、逃生與外牆，通常另有法定限制。",
+      "sources": [
+        {"source_title": "公寓大廈管理條例沿革", "source_url": "https://law.moj.gov.tw/LawClass/LawHistory.aspx?pcode=D0070118", "source_type": "全國法規資料庫", "verified": true, "notes": "核對民國92、105、111年修法。"},
+        {"source_title": "公寓大廈管理條例現行條文", "source_url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=D0070118", "source_type": "全國法規資料庫", "verified": true, "notes": "核對第7、8、18、29條之1現行規定。"}
+      ]
+    },
+    {
+      "id": "consumer-standard-contracts",
+      "law_name": "消費者保護法",
+      "title": "不動產定型化契約為什麼不能只寫『買方已全部看過』？",
+      "category": "定型化契約與廣告",
+      "priority": "high",
+      "content_status": "verified",
+      "keywords": ["定型化契約", "審閱期間", "應記載事項", "不得記載事項", "預售屋契約", "廣告責任"],
+      "one_liner": "不動產契約金額高且通常由業者預先擬好，消費者保護法以合理審閱期間、應記載與不得記載事項及廣告履行責任，限制業者用制式條款轉嫁風險。",
+      "timeline": [
+        {"year": "民國83年1月11日", "title": "消費者保護法制定", "description": "建立商品服務安全、定型化契約、特種交易及消費爭議處理的基本制度。", "verified": true},
+        {"year": "民國92年1月22日", "title": "增訂定型化契約審閱規則", "description": "增訂第11條之1等條文，明定訂約前應給消費者合理審閱期間。", "verified": true},
+        {"year": "民國104年6月17日", "title": "大幅修正消費者保護制度", "description": "修正第11條之1、第17、19、22條等規定，強化定型化契約、通訊交易及廣告責任。", "verified": true},
+        {"year": "民國105年1月1日", "title": "部分新制施行", "description": "通訊交易等修正規定依行政院命令施行。", "verified": true}
+      ],
+      "what_happened": "預售屋、成屋買賣、委託銷售與住宅租賃常使用業者預擬的長篇契約。消費者若只能在簽約現場快速簽名，形式上同意不代表真正理解風險；法律因此保障審閱時間，並允許主管機關公告特定交易的應記載及不得記載事項。",
+      "why_current_law": "第11條之1要求訂約前給予三十日以內的合理審閱期間，拋棄審閱權的條款無效；第17條讓公告的應記載事項即使漏寫仍構成契約內容，不得記載事項則無效；第22條要求企業實際履行廣告內容。這些規則與民法契約效力、平均地權條例預售屋規範可同時適用。",
+      "exam_memory": "定型化契約三查：有沒有合理審閱、是否漏掉應記載、是否寫入不得記載；廣告承諾不能簽約後就消失。",
+      "sources": [
+        {"source_title": "消費者保護法沿革", "source_url": "https://law.moj.gov.tw/LawClass/LawHistory.aspx?pcode=J0170001", "source_type": "全國法規資料庫", "verified": true, "notes": "核對民國83年制定、92年增訂及104年修正。"},
+        {"source_title": "消費者保護法現行條文", "source_url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=J0170001", "source_type": "全國法規資料庫", "verified": true, "notes": "核對第11條之1、第17、19及22條現行規定。"}
+      ]
+    },
+    {
+      "id": "fair-trade-real-estate-advertising",
+      "law_name": "公平交易法",
+      "title": "不動產廣告為什麼同時受公平交易法約束？",
+      "category": "廣告與交易秩序",
+      "priority": "high",
+      "content_status": "verified",
+      "keywords": ["不動產廣告", "虛偽不實", "引人錯誤", "廣告代理業", "交易秩序", "公平交易法第21條"],
+      "one_liner": "消費者保護法著重消費者與企業間的契約權益；公平交易法則從市場交易秩序出發，禁止足以影響交易決定的虛偽不實或引人錯誤表示。",
+      "timeline": [
+        {"year": "民國80年2月4日", "title": "公平交易法制定", "description": "建立競爭秩序與不公平競爭行為的基本規範。", "verified": true},
+        {"year": "民國88年、99年、100年", "title": "廣告責任條文陸續修正", "description": "第21條歷經修正，逐步整理廣告主、代理業、媒體與薦證者的責任。", "verified": true},
+        {"year": "民國104年2月4日", "title": "全文修正公布", "description": "全文修正為50條，現行第21條維持對虛偽不實或引人錯誤表示的禁止。", "verified": true}
+      ],
+      "what_happened": "建案名稱、距離車站、使用分區、坪數、公共設施、景觀與未來發展等廣告訊息，都可能直接影響買方決定。如果業者用模糊圖片、小字但書或無法實現的承諾吸引交易，不只形成個別契約糾紛，也會讓誠實業者在市場上處於不利地位。",
+      "why_current_law": "第21條禁止對足以影響交易決定的商品或服務事項作虛偽不實或引人錯誤表示，並在明知或可得而知時，使廣告代理業、媒體業或薦證者承擔相應責任；第25條則補充禁止其他足以影響交易秩序的欺罔或顯失公平行為。",
+      "exam_memory": "廣告題先問內容是否影響交易決定，再判虛偽不實或引人錯誤；不是只有廣告主可能負責。",
+      "sources": [
+        {"source_title": "公平交易法沿革", "source_url": "https://law.moj.gov.tw/LawClass/LawHistory.aspx?pcode=J0150002", "source_type": "全國法規資料庫", "verified": true, "notes": "核對民國80年制定、第21條歷次修正及104年全文修正。"},
+        {"source_title": "公平交易法現行條文", "source_url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=J0150002", "source_type": "全國法規資料庫", "verified": true, "notes": "核對第21條廣告表示及第25條交易秩序規定。"}
+      ]
     }
   ],
   "links": [
@@ -277,6 +590,20 @@
     {"law_name":"土地法","article_no":"135","topic_id":"land-readjustment"},{"law_name":"土地法","article_no":"136","topic_id":"land-readjustment"},{"law_name":"土地法","article_no":"137","topic_id":"land-readjustment"},{"law_name":"土地法","article_no":"138","topic_id":"land-readjustment"},{"law_name":"土地法","article_no":"139","topic_id":"land-readjustment"},{"law_name":"土地法","article_no":"140","topic_id":"land-readjustment"},{"law_name":"土地法","article_no":"141","topic_id":"land-readjustment"},{"law_name":"土地法","article_no":"142","topic_id":"land-readjustment"},
     {"law_name":"土地法","article_no":"143","topic_id":"equalization-land-rights"},{"law_name":"土地法","article_no":"144","topic_id":"equalization-land-rights"},{"law_name":"土地法","article_no":"145","topic_id":"equalization-land-rights"},{"law_name":"土地法","article_no":"146","topic_id":"equalization-land-rights"},{"law_name":"土地法","article_no":"147","topic_id":"equalization-land-rights"},{"law_name":"土地法","article_no":"148","topic_id":"equalization-land-rights"},{"law_name":"土地法","article_no":"149","topic_id":"equalization-land-rights"},{"law_name":"土地法","article_no":"150","topic_id":"equalization-land-rights"},{"law_name":"土地法","article_no":"151","topic_id":"equalization-land-rights"},{"law_name":"土地法","article_no":"152","topic_id":"equalization-land-rights"},{"law_name":"土地法","article_no":"153","topic_id":"equalization-land-rights"},{"law_name":"土地法","article_no":"154","topic_id":"equalization-land-rights"},{"law_name":"土地法","article_no":"155","topic_id":"equalization-land-rights"},{"law_name":"土地法","article_no":"156","topic_id":"equalization-land-rights"},{"law_name":"土地法","article_no":"157","topic_id":"equalization-land-rights"},{"law_name":"土地法","article_no":"158","topic_id":"equalization-land-rights"},{"law_name":"土地法","article_no":"159","topic_id":"equalization-land-rights"},{"law_name":"土地法","article_no":"160","topic_id":"equalization-land-rights"},{"law_name":"土地法","article_no":"167","topic_id":"equalization-land-rights"},{"law_name":"土地法","article_no":"168","topic_id":"equalization-land-rights"},{"law_name":"土地法","article_no":"169","topic_id":"equalization-land-rights"},{"law_name":"土地法","article_no":"170","topic_id":"equalization-land-rights"},{"law_name":"土地法","article_no":"171","topic_id":"equalization-land-rights"},{"law_name":"土地法","article_no":"172","topic_id":"equalization-land-rights"},{"law_name":"土地法","article_no":"173","topic_id":"equalization-land-rights"},{"law_name":"土地法","article_no":"174","topic_id":"equalization-land-rights"},
     {"law_name":"土地法","article_no":"176","topic_id":"land-value-increment-tax"},{"law_name":"土地法","article_no":"177","topic_id":"land-value-increment-tax"},{"law_name":"土地法","article_no":"178","topic_id":"land-value-increment-tax"},{"law_name":"土地法","article_no":"179","topic_id":"land-value-increment-tax"},{"law_name":"土地法","article_no":"180","topic_id":"land-value-increment-tax"},{"law_name":"土地法","article_no":"181","topic_id":"land-value-increment-tax"},{"law_name":"土地法","article_no":"182","topic_id":"land-value-increment-tax"},{"law_name":"土地法","article_no":"183","topic_id":"land-value-increment-tax"},{"law_name":"土地法","article_no":"184","topic_id":"land-value-increment-tax"},
-    {"law_name":"土地法","article_no":"208","topic_id":"public-expropriation"},{"law_name":"土地法","article_no":"209","topic_id":"public-expropriation"},{"law_name":"土地法","article_no":"213","topic_id":"public-expropriation"},{"law_name":"土地法","article_no":"214","topic_id":"public-expropriation"},{"law_name":"土地法","article_no":"212","topic_id":"zone-expropriation"},{"law_name":"土地法","article_no":"219","topic_id":"expropriated-land-recovery"},{"law_name":"土地法","article_no":"219-1","topic_id":"expropriated-land-recovery"}
+    {"law_name":"土地法","article_no":"208","topic_id":"public-expropriation"},{"law_name":"土地法","article_no":"209","topic_id":"public-expropriation"},{"law_name":"土地法","article_no":"213","topic_id":"public-expropriation"},{"law_name":"土地法","article_no":"214","topic_id":"public-expropriation"},{"law_name":"土地法","article_no":"212","topic_id":"zone-expropriation"},{"law_name":"土地法","article_no":"219","topic_id":"expropriated-land-recovery"},{"law_name":"土地法","article_no":"219-1","topic_id":"expropriated-land-recovery"},
+    {"law_name":"民法","article_no":"12","topic_id":"civil-majority-age"},{"law_name":"民法","article_no":"13","topic_id":"civil-majority-age"},
+    {"law_name":"民法","article_no":"203","topic_id":"civil-interest-cap"},{"law_name":"民法","article_no":"205","topic_id":"civil-interest-cap"},
+    {"law_name":"民法","article_no":"758","topic_id":"civil-property-reform"},{"law_name":"民法","article_no":"759-1","topic_id":"civil-property-reform"},{"law_name":"民法","article_no":"826-1","topic_id":"civil-property-reform"},{"law_name":"民法","article_no":"881-1","topic_id":"civil-property-reform"},{"law_name":"民法","article_no":"881-4","topic_id":"civil-property-reform"},
+    {"law_name":"平均地權條例","article_no":"47","topic_id":"equalization-real-price-registration"},{"law_name":"平均地權條例","article_no":"47-3","topic_id":"equalization-real-price-registration"},{"law_name":"平均地權條例","article_no":"81-2","topic_id":"equalization-real-price-registration"},
+    {"law_name":"平均地權條例","article_no":"47-3","topic_id":"equalization-presale-anti-speculation"},{"law_name":"平均地權條例","article_no":"47-4","topic_id":"equalization-presale-anti-speculation"},{"law_name":"平均地權條例","article_no":"47-5","topic_id":"equalization-presale-anti-speculation"},{"law_name":"平均地權條例","article_no":"79-1","topic_id":"equalization-presale-anti-speculation"},{"law_name":"平均地權條例","article_no":"81-3","topic_id":"equalization-presale-anti-speculation"},{"law_name":"平均地權條例","article_no":"81-4","topic_id":"equalization-presale-anti-speculation"},
+    {"law_name":"房屋稅條例","article_no":"4","topic_id":"house-tax-2"},{"law_name":"房屋稅條例","article_no":"5","topic_id":"house-tax-2"},{"law_name":"房屋稅條例","article_no":"6","topic_id":"house-tax-2"},{"law_name":"房屋稅條例","article_no":"6-1","topic_id":"house-tax-2"},{"law_name":"房屋稅條例","article_no":"7","topic_id":"house-tax-2"},{"law_name":"房屋稅條例","article_no":"15","topic_id":"house-tax-2"},
+    {"law_name":"所得稅法","article_no":"4-4","topic_id":"integrated-housing-land-tax"},{"law_name":"所得稅法","article_no":"4-5","topic_id":"integrated-housing-land-tax"},{"law_name":"所得稅法","article_no":"14-4","topic_id":"integrated-housing-land-tax"},{"law_name":"所得稅法","article_no":"14-5","topic_id":"integrated-housing-land-tax"},{"law_name":"所得稅法","article_no":"14-6","topic_id":"integrated-housing-land-tax"},
+    {"law_name":"不動產經紀業管理條例","article_no":"6","topic_id":"broker-professional-regulation"},{"law_name":"不動產經紀業管理條例","article_no":"7","topic_id":"broker-professional-regulation"},{"law_name":"不動產經紀業管理條例","article_no":"13","topic_id":"broker-professional-regulation"},{"law_name":"不動產經紀業管理條例","article_no":"14","topic_id":"broker-professional-regulation"},{"law_name":"不動產經紀業管理條例","article_no":"15","topic_id":"broker-professional-regulation"},{"law_name":"不動產經紀業管理條例","article_no":"22","topic_id":"broker-professional-regulation"},{"law_name":"不動產經紀業管理條例","article_no":"24","topic_id":"broker-professional-regulation"},{"law_name":"不動產經紀業管理條例","article_no":"24-1","topic_id":"broker-professional-regulation"},{"law_name":"不動產經紀業管理條例","article_no":"29","topic_id":"broker-professional-regulation"},{"law_name":"不動產經紀業管理條例","article_no":"31","topic_id":"broker-professional-regulation"},
+    {"law_name":"土地徵收條例","article_no":"1","topic_id":"land-expropriation-act-origin"},{"law_name":"土地徵收條例","article_no":"3","topic_id":"land-expropriation-act-origin"},{"law_name":"土地徵收條例","article_no":"3-1","topic_id":"land-expropriation-act-origin"},{"law_name":"土地徵收條例","article_no":"10","topic_id":"land-expropriation-act-origin"},{"law_name":"土地徵收條例","article_no":"11","topic_id":"land-expropriation-act-origin"},{"law_name":"土地徵收條例","article_no":"18-1","topic_id":"land-expropriation-act-origin"},
+    {"law_name":"土地徵收條例","article_no":"30","topic_id":"land-expropriation-market-value"},{"law_name":"土地徵收條例","article_no":"40","topic_id":"land-expropriation-market-value"},{"law_name":"土地徵收條例","article_no":"44","topic_id":"land-expropriation-market-value"},
+    {"law_name":"公寓大廈管理條例","article_no":"23","topic_id":"condominium-management-evolution"},{"law_name":"公寓大廈管理條例","article_no":"25","topic_id":"condominium-management-evolution"},{"law_name":"公寓大廈管理條例","article_no":"29","topic_id":"condominium-management-evolution"},{"law_name":"公寓大廈管理條例","article_no":"36","topic_id":"condominium-management-evolution"},
+    {"law_name":"公寓大廈管理條例","article_no":"7","topic_id":"condominium-common-safety"},{"law_name":"公寓大廈管理條例","article_no":"8","topic_id":"condominium-common-safety"},{"law_name":"公寓大廈管理條例","article_no":"18","topic_id":"condominium-common-safety"},{"law_name":"公寓大廈管理條例","article_no":"29-1","topic_id":"condominium-common-safety"},{"law_name":"公寓大廈管理條例","article_no":"49-1","topic_id":"condominium-common-safety"},
+    {"law_name":"消費者保護法","article_no":"11-1","topic_id":"consumer-standard-contracts"},{"law_name":"消費者保護法","article_no":"17","topic_id":"consumer-standard-contracts"},{"law_name":"消費者保護法","article_no":"19","topic_id":"consumer-standard-contracts"},{"law_name":"消費者保護法","article_no":"22","topic_id":"consumer-standard-contracts"},
+    {"law_name":"公平交易法","article_no":"21","topic_id":"fair-trade-real-estate-advertising"},{"law_name":"公平交易法","article_no":"25","topic_id":"fair-trade-real-estate-advertising"}
   ]
 }
