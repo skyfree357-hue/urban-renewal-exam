@@ -51,7 +51,7 @@ async function loadJson(url,key){
 }
 
 async function loadLegalHistory(){
-  const response=await fetch('./data/legal_history.json?v=20260823-1');
+  const response=await fetch('./data/legal_history.json?v=20260826-1');
   if(!response.ok)return {topics:[],links:[]};
   const data=await response.json();
   return {topics:Array.isArray(data.topics)?data.topics:[],links:Array.isArray(data.links)?data.links:[]};
@@ -309,7 +309,7 @@ function renderHistoryTopic(topicId){
   const timeline=(topic.timeline||[]).map(item=>`<li class="${item.verified?'verified':'unverified'}"><time>${escapeHtml(item.year)}</time><div><b>${escapeHtml(item.title)}</b><p>${escapeHtml(item.description)}</p>${item.verified?'':'<small>待查證</small>'}</div></li>`).join('');
   const related=historyLinksForTopic(topic.id).map(link=>`<button type="button" data-history-open-law="${escapeHtml(link.law_name)}" data-history-article="${escapeHtml(link.article_no)}">${escapeHtml(link.law_name)}第 ${escapeHtml(link.article_no)} 條</button>`).join('');
   const sources=(topic.sources||[]).map(source=>`<li><a href="${escapeHtml(source.source_url)}" target="_blank" rel="noreferrer">${escapeHtml(source.source_title)}</a><span>${escapeHtml(source.source_type)}・${source.verified?'已核對':'待查證'}</span>${source.notes?`<small>${escapeHtml(source.notes)}</small>`:''}</li>`).join('');
-  $('#history-topic').innerHTML=`<header class="history-topic-head"><div><span class="history-category">${escapeHtml(topic.category)}</span>${topic.priority==='high'?'<span class="history-priority">高優先</span>':''}</div><h2>${escapeHtml(topic.title)}</h2></header><section class="history-at-a-glance"><h3>一句話先懂</h3><p>${escapeHtml(topic.one_liner)}</p></section><section><h3>🕰️ 歷史時間軸</h3><ol class="history-timeline">${timeline}</ol></section><section><h3>📖 當時發生什麼事？</h3><p>${escapeHtml(topic.what_happened)}</p></section><section><h3>⚖️ 為什麼最後變成今天的法律？</h3><p>${escapeHtml(topic.why_current_law)}</p></section><section class="history-memory"><h3>🧠 考試一句記憶</h3><p>${escapeHtml(topic.exam_memory)}</p></section><section><h3>🔗 相關土地法條</h3><div class="history-law-links">${related}</div></section><section><h3>📚 資料來源</h3><ul class="history-sources">${sources}</ul></section>`;
+  $('#history-topic').innerHTML=`<header class="history-topic-head"><div><span class="history-category">${escapeHtml(topic.category)}</span>${topic.priority==='high'?'<span class="history-priority">高優先</span>':''}</div><h2>${escapeHtml(topic.title)}</h2></header><section class="history-at-a-glance"><h3>一句話先懂</h3><p>${escapeHtml(topic.one_liner)}</p></section><section><h3>🕰️ 歷史時間軸</h3><ol class="history-timeline">${timeline}</ol></section><section><h3>📖 當時發生什麼事？</h3><p>${escapeHtml(topic.what_happened)}</p></section><section><h3>⚖️ 為什麼最後變成今天的法律？</h3><p>${escapeHtml(topic.why_current_law)}</p></section><section class="history-memory"><h3>🧠 考試一句記憶</h3><p>${escapeHtml(topic.exam_memory)}</p></section><section><h3>🔗 相關法條</h3><div class="history-law-links">${related}</div></section><section><h3>📚 資料來源</h3><ul class="history-sources">${sources}</ul></section>`;
 }
 
 function backFromHistory(){
