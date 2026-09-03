@@ -130,7 +130,14 @@ async function init() { const saved=localStorage.getItem(STORAGE_KEY), verified=
 function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(bank)); window.syncSharedQuestionBank?.(bank); }
 function refreshInfo() { $('bankInfo').textContent=`目前題庫：單選 ${bank.single_choice.length} 題／複選 ${bank.multiple_choice.length} 題`; }
 function shuffle(a) { return [...a].sort(()=>Math.random()-.5); }
+const EXAM_ACCESS_PASSWORD = '0000';
 function startExam() {
+  const enteredPassword = window.prompt('請輸入測驗密碼：');
+  if (enteredPassword === null) return;
+  if (enteredPassword !== EXAM_ACCESS_PASSWORD) {
+    alert('密碼錯誤，無法開始測驗。');
+    return;
+  }
   if(bank.single_choice.length<25 || bank.multiple_choice.length<25) return alert('題庫不足：單選與複選各至少需要 25 題。請先於後台匯入完整題庫。');
   const excluded={
     single_choice:new Set(recentExamIds.flatMap(round=>[...round.single_choice])),
