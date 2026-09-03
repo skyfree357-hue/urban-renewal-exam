@@ -147,7 +147,9 @@ function startExam() {
   const singles=draw(bank.single_choice,'single_choice'), multiples=draw(bank.multiple_choice,'multiple_choice');
   exam=[...singles.map(q=>({...q,type:'single_choice'})),...multiples.map(q=>({...q,type:'multiple_choice'}))];
   recentExamIds.push({single_choice:new Set(singles.map(q=>String(q.id))),multiple_choice:new Set(multiples.map(q=>String(q.id)))});
-  if(recentExamIds.length===3) recentExamIds=[];
+  // 每輪各抽 25 題，8 輪剛好涵蓋單選、複選各 200 題。
+  // 第 9 次才重新開始下一輪隨機抽題。
+  if(recentExamIds.length===8) recentExamIds=[];
   submitted=false;
   ['submitBtn','submitBtnBottom','floatingSubmit'].forEach(id=>{const btn=$(id);if(btn){btn.disabled=false;btn.classList.remove('opacity-50');}});
   $('welcome').classList.add('hidden');$('examArea').classList.remove('hidden');$('result').classList.add('hidden');$('floatingSubmit').classList.remove('hidden');renderExam();window.scrollTo({top:0,behavior:'smooth'});
